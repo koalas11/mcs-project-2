@@ -20,8 +20,8 @@ int dct_shutdown(dct_context *ctx);
  * @param length 
  * @return int result: 0 success, -1 error.
  */
-int dct1d(double* vector, size_t length);
-int idct1d(double* vector, size_t length);
+int dct1d(double* base, size_t length, size_t stride, double* out);
+int idct1d(double* vector, size_t length, size_t stride, double* out);
 
 /**
  * @brief Apply dct to the given matrix
