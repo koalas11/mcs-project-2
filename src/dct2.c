@@ -8,105 +8,219 @@
 #undef M_PI
 #define M_PI 3.14159265358979323846264338327950288
 
-typedef struct dct_context {} dct_context;
+typedef struct {
+  size_t max_n;    // size of the largest transform we'll do
+  double* scratch; // single buffer of length max_n
+} dct_context;
 
-dct_context* dct_context_alloc() {
-  return malloc(sizeof(dct_context));
+// Allocate a context capable of handling up to `max_n`‑length transforms
+dct_context* dct_context_alloc(size_t max_n) {
+  dct_context* ctx = malloc(sizeof(dct_context));
+  if (!ctx) return NULL;
+  ctx->max_n = max_n;
+  ctx->scratch = malloc(sizeof(double) * max_n);
+  if (!ctx->scratch) {
+    free(ctx);
+    return NULL;
+  }
+  return ctx;
 }
+
 void dct_context_free(dct_context* ctx) {
+  if (!ctx) return;
+  free(ctx->scratch);
   free(ctx);
 }
 
 int dct_init(dct_context* ctx) {
   return 0;
 }
+
 int dct_shutdown(dct_context* ctx) {
   return 0;
 }
 
-int dct1d(double* base, size_t length, size_t stride, double* out) {
-  // double* c = malloc(length * sizeof(double));
-  if (!out) return -1;
-  if (stride <= 0) return -1;
+// 1D DCT (in‑place if out == base)
+int dct1d(dct_context* ctx,
+  double* func,
+  size_t length,
+  size_t stride,
+  double* out) {
+  if (!ctx || !func || !out || stride == 0 || length > ctx->max_n)
+    return -1;
 
+  double* T = ctx->scratch;
   for (size_t k = 0; k < length; ++k) {
-    double s = 0;
-    double alpha = (k == 0) ? 1.0 / sqrt((double)length) : sqrt(2.0 / length);
-
-    for (size_t i = 0; i < length; ++i)
-      s += base[i * stride] * cos(k * M_PI * ((2.0 * i + 1) / (2.0 * length)));
-
-    out[k] = alpha * s;
-  }
-
-  // for (size_t i = 0; i < length; ++i)
-  //   base[i * stride] = c[i];
-
-  // free(c);
-  return 0;
-}
-
-int idct1d(double* vector, size_t length, size_t stride, double* out) {
-  // double* f = malloc(length * sizeof(double));
-  if (!out) return -1;
-  if (stride <= 0) return -1;
-
-  for (size_t i = 0; i < length; ++i) {
-    double s = 0;
-
-    for (size_t k = 0; k < length; ++k) {
-      double alpha = (k == 0) ? 1.0 / sqrt((double)length) : sqrt(2.0 / length);
-
-      s += vector[k * stride] * alpha * cos(k * M_PI * ((2.0 * i + 1) / (2.0 * length)));
+    double sum = 0.0;
+    double alpha = (k == 0) ? 1.0 / sqrt((double)length)
+      : sqrt(2.0 / length);
+    for (size_t i = 0; i < length; ++i) {
+      sum += func[i * stride]
+        * cos(k * M_PI * (2.0 * i + 1.0) / (2.0 * length));
     }
+    T[k] = alpha * sum;
+  }
+  // copy back (allows out == func)
+  for (size_t i = 0; i < length; ++i) {
+    out[i * stride] = T[i];
+  }
+  return 0;
+}
 
-    out[i] = s;
+// 1D inverse DCT
+int idct1d(dct_context* ctx,
+  double* coeff,
+  size_t length,
+  size_t stride,
+  double* out) {
+  if (!ctx || !coeff || !out || stride == 0 || length > ctx->max_n)
+    return -1;
+
+  double* T = ctx->scratch;
+  for (size_t i = 0; i < length; ++i) {
+    double sum = 0.0;
+    for (size_t k = 0; k < length; ++k) {
+      double alpha = (k == 0) ? 1.0 / sqrt((double)length)
+        : sqrt(2.0 / length);
+      sum += coeff[k * stride]
+        * alpha
+        * cos(k * M_PI * (2.0 * i + 1.0) / (2.0 * length));
+    }
+    T[i] = sum;
+  }
+  for (size_t i = 0; i < length; ++i) {
+    out[i * stride] = T[i];
+  }
+  return 0;
+}
+
+// 2D DCT: rows then columns, in‑place
+int dct2d(dct_context* ctx,
+  double* matrix,
+  size_t width,
+  size_t height) {
+  if (!ctx || !matrix || width * height > ctx->max_n * ctx->max_n)
+    return -1;
+
+  // First pass: DCT each row (stride = 1)
+  for (size_t r = 0; r < height; ++r) {
+    double* row = matrix + r * width;
+    if (dct1d(ctx, row, width, 1, row) < 0)
+      return -1;
   }
 
-  // memcpy(f, vector, length * sizeof(double));
-  // free(f);
+  // Second pass: DCT each column (stride = width)
+  for (size_t c = 0; c < width; ++c) {
+    double* col = matrix + c;
+    if (dct1d(ctx, col, height, width, col) < 0)
+      return -1;
+  }
 
   return 0;
 }
 
-int dct2d(double* matrix, size_t width, size_t height) {
-  double* temp = (double*)malloc((width > height ? width : height) * sizeof(double));
-  if (!temp) return -1;
+// 2D inverse DCT: rows then columns, in‑place
+int idct2d(dct_context* ctx,
+  double* matrix,
+  size_t width,
+  size_t height) {
+  if (!ctx || !matrix || width * height > ctx->max_n * ctx->max_n)
+    return -1;
 
-  for (size_t row = 0; row < height; ++row) {
-    dct1d(&matrix[row * width], width, 1, temp);
-    for (size_t i = 0; i < width; ++i)
-      matrix[row * width + i] = temp[i];
+  // Inverse DCT each row
+  for (size_t r = 0; r < height; ++r) {
+    double* row = matrix + r * width;
+    if (idct1d(ctx, row, width, 1, row) < 0)
+      return -1;
   }
 
-  for (size_t col = 0; col < width; ++col) {
-    dct1d(&matrix[col], height, width, temp);
-    for (size_t i = 0; i < height; ++i)
-      matrix[i * width + col] = temp[i];
+  // Inverse DCT each column
+  for (size_t c = 0; c < width; ++c) {
+    double* col = matrix + c;
+    if (idct1d(ctx, col, height, width, col) < 0)
+      return -1;
   }
-
-  free(temp);
 
   return 0;
 }
 
-int idct2d(double* matrix, size_t width, size_t height) {
-  double* temp = (double*)malloc((width > height ? width : height) * sizeof(double));
-  if (!temp) return -1;
+void _adj_block(size_t width, size_t height,
+  size_t blk_size,
+  size_t* out_bw, size_t* out_bh) {
+  // numero di blocchi in ciascuna direzione
+  size_t nx = (width + blk_size - 1) / blk_size;
+  size_t ny = (height + blk_size - 1) / blk_size;
+  // dimensione effettiva dei blocchi (ceil division)
+  *out_bw = (width + nx - 1) / nx;
+  *out_bh = (height + ny - 1) / ny;
+}
 
-  for (size_t row = 0; row < height; ++row) {
-    idct1d(&matrix[row * width], width, 1, temp);
-    for (size_t i = 0; i < width; ++i)
-      matrix[row * width + i] = temp[i];
+int dct2dblk(dct_context* ctx,
+  double* mat,
+  size_t width,
+  size_t height,
+  size_t blk_size) {
+  if (!ctx || !mat || blk_size == 0) return -1;
+
+  size_t BW, BH;
+  _adj_block(width, height, blk_size, &BW, &BH);
+
+  if (BW > ctx->max_n || BH > ctx->max_n) return -1;
+
+  // ora dividiamo in blocchi BW×BH
+  for (size_t by = 0; by < height; by += BH) {
+    size_t h = (by + BH <= height ? BH : height - by);
+    for (size_t bx = 0; bx < width; bx += BW) {
+      size_t w = (bx + BW <= width ? BW : width - bx);
+
+      // DCT sulle righe del blocco
+      for (size_t i = 0; i < h; ++i) {
+        double* row = mat + (by + i) * width + bx;
+        if (dct1d(ctx, row, w, 1, row) < 0)
+          return -1;
+      }
+      // DCT sulle colonne del blocco
+      for (size_t j = 0; j < w; ++j) {
+        double* col = mat + by * width + (bx + j);
+        if (dct1d(ctx, col, h, width, col) < 0)
+          return -1;
+      }
+    }
   }
+  return 0;
+}
 
-  for (size_t col = 0; col < width; ++col) {
-    idct1d(&matrix[col], height, width, temp);
-    for (size_t i = 0; i < height; ++i)
-      matrix[i * width + col] = temp[i];
+// iDCT 2D a blocchi “arrotondati”
+int idct2dblk(dct_context* ctx,
+  double* mat,
+  size_t width,
+  size_t height,
+  size_t blk_size) {
+  if (!ctx || !mat || blk_size == 0) return -1;
+
+  size_t BW, BH;
+  _adj_block(width, height, blk_size, &BW, &BH);
+
+  if (BW > ctx->max_n || BH > ctx->max_n) return -1;
+
+  for (size_t by = 0; by < height; by += BH) {
+    size_t h = (by + BH <= height ? BH : height - by);
+    for (size_t bx = 0; bx < width; bx += BW) {
+      size_t w = (bx + BW <= width ? BW : width - bx);
+
+      // iDCT sulle righe del blocco
+      for (size_t i = 0; i < h; ++i) {
+        double* row = mat + (by + i) * width + bx;
+        if (idct1d(ctx, row, w, 1, row) < 0)
+          return -1;
+      }
+      // iDCT sulle colonne del blocco
+      for (size_t j = 0; j < w; ++j) {
+        double* col = mat + by * width + (bx + j);
+        if (idct1d(ctx, col, h, width, col) < 0)
+          return -1;
+      }
+    }
   }
-
-  free(temp);
-
   return 0;
 }
