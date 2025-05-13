@@ -1,0 +1,6 @@
+{
+    "tinymist.lint.enabled": true,
+    "[typst]": {
+        "editor.formatOnSave": true
+    }
+}
