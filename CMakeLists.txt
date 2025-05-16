@@ -32,6 +32,13 @@ target_link_libraries(dct2 GSL::gsl GSL::gslcblas)
 
 if(MSVC)
     target_compile_options(dct2 PRIVATE /W4)
+    target_compile_definitions(dct2 PRIVATE
+        DLL_EXPORT
+        _USE_MATH_DEFINES
+    )
 else()
     target_compile_options(dct2 PRIVATE -Wall -Wextra -pedantic)
+    target_compile_definitions(dct2 PRIVATE
+        DLL_EXPORT
+    )
 endif()

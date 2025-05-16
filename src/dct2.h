@@ -8,7 +8,7 @@
 #if defined(DLL_EXPORT)
 #define DCT_API __declspec(dllexport)
 #else
-#define DCT_API __declspec(dllimport)
+#define DCT_API
 #endif
 #elif defined(__GNUC__)
 // GCC

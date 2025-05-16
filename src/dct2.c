@@ -12,7 +12,7 @@ typedef struct dct_context {
 } dct_context;
 
 // Allocate a context capable of handling up to `max_n`‑length transforms
-dct_context* dct_context_alloc(size_t max_n) {
+DCT_API dct_context* dct_context_alloc(size_t max_n) {
   dct_context* ctx = (dct_context*) malloc(sizeof(dct_context));
   if (!ctx) return NULL;
   ctx->max_n = max_n;
@@ -39,7 +39,7 @@ int dct_shutdown(dct_context* ctx) {
 }
 
 // 1D DCT (in‑place if out == base)
-int dct1d(dct_context* ctx,
+DCT_API int dct1d(dct_context* ctx,
   double* func,
   size_t length,
   size_t stride,
@@ -68,7 +68,7 @@ int dct1d(dct_context* ctx,
 }
 
 // 1D inverse DCT
-int idct1d(dct_context* ctx,
+DCT_API int idct1d(dct_context* ctx,
   double* coeff,
   size_t length,
   size_t stride,
@@ -96,7 +96,7 @@ int idct1d(dct_context* ctx,
 }
 
 // 2D DCT: rows then columns, in‑place
-int dct2d(dct_context* ctx,
+DCT_API int dct2d(dct_context* ctx,
   double* matrix,
   size_t width,
   size_t height) {
@@ -121,7 +121,7 @@ int dct2d(dct_context* ctx,
 }
 
 // 2D inverse DCT: rows then columns, in‑place
-int idct2d(dct_context* ctx,
+DCT_API int idct2d(dct_context* ctx,
   double* matrix,
   size_t width,
   size_t height) {
@@ -157,7 +157,7 @@ void _adj_block(size_t width, size_t height,
 }
 
 
-int dct2dblkrounded(dct_context* ctx,
+DCT_API int dct2dblkrounded(dct_context* ctx,
   double* mat,
   size_t width,
   size_t height,
@@ -193,7 +193,7 @@ int dct2dblkrounded(dct_context* ctx,
 }
 
 // iDCT 2D a blocchi “arrotondati”
-int idct2dblkrounded(dct_context* ctx,
+DCT_API int idct2dblkrounded(dct_context* ctx,
   double* mat,
   size_t width,
   size_t height,
@@ -228,7 +228,7 @@ int idct2dblkrounded(dct_context* ctx,
 }
 
 
-int dct2dblk(dct_context* ctx,
+DCT_API int dct2dblk(dct_context* ctx,
   double* mat,
   size_t width,
   size_t height,
@@ -266,7 +266,7 @@ int dct2dblk(dct_context* ctx,
 }
 
 // iDCT 2D a blocchi completi (ignora blocchi parziali)
-int idct2dblk(dct_context* ctx,
+DCT_API int idct2dblk(dct_context* ctx,
   double* mat,
   size_t width,
   size_t height,
