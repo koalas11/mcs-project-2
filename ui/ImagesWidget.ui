@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" name="MainLayout">
+  <layout class="QHBoxLayout" name="MainLayout" stretch="1,1">
    <item>
     <widget class="QGraphicsView" name="OriginalImg"/>
    </item>

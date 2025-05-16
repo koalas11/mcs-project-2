@@ -1,6 +1,6 @@
 .idea
 .venv
 __pycache__
-report/latex_build
-old
+old/
 build/
+target/

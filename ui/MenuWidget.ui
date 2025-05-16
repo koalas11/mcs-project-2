@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="ImageLabel">
+    <widget class="QLabel" name="ImageFileLabel">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
        <horstretch>0</horstretch>
@@ -23,7 +23,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>File: </string>
+      <string>Image File:</string>
      </property>
     </widget>
    </item>
@@ -35,7 +35,7 @@
      <item>
       <widget class="QPushButton" name="ImageBrowseButton">
        <property name="text">
-        <string>PushButton</string>
+        <string>Browse</string>
        </property>
       </widget>
      </item>
@@ -49,59 +49,109 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <layout class="QHBoxLayout" name="GridLayout">
      <property name="topMargin">
       <number>0</number>
      </property>
      <item>
       <widget class="QSpinBox" name="GridSizeSpinBox">
        <property name="minimum">
-        <number>2</number>
+        <number>1</number>
        </property>
        <property name="maximum">
         <number>100</number>
        </property>
        <property name="value">
-        <number>5</number>
+        <number>2</number>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="ToggleGridButton">
        <property name="text">
-        <string>PushButton</string>
+        <string>Disable Grid</string>
        </property>
       </widget>
      </item>
     </layout>
    </item>
    <item>
-    <widget class="QLabel" name="GridColorLabel">
-     <property name="text">
-      <string>Current Grid Color:</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="GridColorLayout">
      <property name="topMargin">
       <number>0</number>
      </property>
      <item>
-      <widget class="QLabel" name="GridColorValueLabel">
+      <widget class="QLabel" name="GridColorLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Current Grid Color:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Policy::Maximum</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="GridColorValue">
        <property name="text">
         <string notr="true"/>
        </property>
       </widget>
      </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="Line" name="line_3">
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="CutOffThresholdLayout">
+     <property name="topMargin">
+      <number>0</number>
+     </property>
      <item>
-      <widget class="QPushButton" name="GridColorBrowseButton">
+      <widget class="QLabel" name="CutOffThresholdLabel">
        <property name="text">
-        <string>PushButton</string>
+        <string>Cut Off Threshold</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="CutOffThresholdSpinBox">
+       <property name="maximum">
+        <number>100</number>
        </property>
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="Line" name="line_2">
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QPushButton" name="ApplyButton">

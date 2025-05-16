@@ -24,6 +24,7 @@
 #endif
 
 #include <stdint.h>
+#include <stddef.h>
 
 typedef struct dct_context dct_context;
 
@@ -38,6 +39,9 @@ DCT_API int idct1d(dct_context* ctx, double* coeff, size_t length, size_t stride
 
 DCT_API int dct2d(dct_context* ctx, double* matrix, size_t width, size_t height);
 DCT_API int idct2d(dct_context* ctx, double* matrix, size_t width, size_t height);
+
+DCT_API int dct2dblkrounded(dct_context* ctx, double* matrix, size_t width, size_t height, size_t blk_size);
+DCT_API int idct2dblkrounded(dct_context* ctx, double* matrix, size_t width, size_t height, size_t blk_size);
 
 DCT_API int dct2dblk(dct_context* ctx, double* matrix, size_t width, size_t height, size_t blk_size);
 DCT_API int idct2dblk(dct_context* ctx, double* matrix, size_t width, size_t height, size_t blk_size);

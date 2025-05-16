@@ -26,15 +26,15 @@ class Ui_MenuWidget(object):
         MenuWidget.resize(400, 300)
         self.verticalLayout = QVBoxLayout(MenuWidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.ImageLabel = QLabel(MenuWidget)
-        self.ImageLabel.setObjectName(u"ImageLabel")
+        self.ImageFileLabel = QLabel(MenuWidget)
+        self.ImageFileLabel.setObjectName(u"ImageFileLabel")
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.ImageLabel.sizePolicy().hasHeightForWidth())
-        self.ImageLabel.setSizePolicy(sizePolicy)
+        sizePolicy.setHeightForWidth(self.ImageFileLabel.sizePolicy().hasHeightForWidth())
+        self.ImageFileLabel.setSizePolicy(sizePolicy)
 
-        self.verticalLayout.addWidget(self.ImageLabel)
+        self.verticalLayout.addWidget(self.ImageFileLabel)
 
         self.ImageFileLayout = QHBoxLayout()
         self.ImageFileLayout.setObjectName(u"ImageFileLayout")
@@ -58,46 +58,81 @@ class Ui_MenuWidget(object):
 
         self.verticalLayout.addWidget(self.line)
 
-        self.horizontalLayout_2 = QHBoxLayout()
-        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalLayout_2.setContentsMargins(-1, 0, -1, -1)
+        self.GridLayout = QHBoxLayout()
+        self.GridLayout.setObjectName(u"GridLayout")
+        self.GridLayout.setContentsMargins(-1, 0, -1, -1)
         self.GridSizeSpinBox = QSpinBox(MenuWidget)
         self.GridSizeSpinBox.setObjectName(u"GridSizeSpinBox")
-        self.GridSizeSpinBox.setMinimum(2)
+        self.GridSizeSpinBox.setMinimum(1)
         self.GridSizeSpinBox.setMaximum(100)
-        self.GridSizeSpinBox.setValue(5)
+        self.GridSizeSpinBox.setValue(2)
 
-        self.horizontalLayout_2.addWidget(self.GridSizeSpinBox)
+        self.GridLayout.addWidget(self.GridSizeSpinBox)
 
         self.ToggleGridButton = QPushButton(MenuWidget)
         self.ToggleGridButton.setObjectName(u"ToggleGridButton")
 
-        self.horizontalLayout_2.addWidget(self.ToggleGridButton)
+        self.GridLayout.addWidget(self.ToggleGridButton)
 
 
-        self.verticalLayout.addLayout(self.horizontalLayout_2)
+        self.verticalLayout.addLayout(self.GridLayout)
 
+        self.GridColorLayout = QHBoxLayout()
+        self.GridColorLayout.setObjectName(u"GridColorLayout")
+        self.GridColorLayout.setContentsMargins(-1, 0, -1, -1)
         self.GridColorLabel = QLabel(MenuWidget)
         self.GridColorLabel.setObjectName(u"GridColorLabel")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.GridColorLabel.sizePolicy().hasHeightForWidth())
+        self.GridColorLabel.setSizePolicy(sizePolicy1)
 
-        self.verticalLayout.addWidget(self.GridColorLabel)
+        self.GridColorLayout.addWidget(self.GridColorLabel)
 
-        self.horizontalLayout = QHBoxLayout()
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.horizontalLayout.setContentsMargins(-1, 0, -1, -1)
-        self.GridColorValueLabel = QLabel(MenuWidget)
-        self.GridColorValueLabel.setObjectName(u"GridColorValueLabel")
-        self.GridColorValueLabel.setText(u"")
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Minimum)
 
-        self.horizontalLayout.addWidget(self.GridColorValueLabel)
+        self.GridColorLayout.addItem(self.horizontalSpacer)
 
-        self.GridColorBrowseButton = QPushButton(MenuWidget)
-        self.GridColorBrowseButton.setObjectName(u"GridColorBrowseButton")
+        self.GridColorValue = QPushButton(MenuWidget)
+        self.GridColorValue.setObjectName(u"GridColorValue")
+        self.GridColorValue.setText(u"")
 
-        self.horizontalLayout.addWidget(self.GridColorBrowseButton)
+        self.GridColorLayout.addWidget(self.GridColorValue)
 
 
-        self.verticalLayout.addLayout(self.horizontalLayout)
+        self.verticalLayout.addLayout(self.GridColorLayout)
+
+        self.line_3 = QFrame(MenuWidget)
+        self.line_3.setObjectName(u"line_3")
+        self.line_3.setFrameShape(QFrame.Shape.HLine)
+        self.line_3.setFrameShadow(QFrame.Shadow.Sunken)
+
+        self.verticalLayout.addWidget(self.line_3)
+
+        self.CutOffThresholdLayout = QHBoxLayout()
+        self.CutOffThresholdLayout.setObjectName(u"CutOffThresholdLayout")
+        self.CutOffThresholdLayout.setContentsMargins(-1, 0, -1, -1)
+        self.CutOffThresholdLabel = QLabel(MenuWidget)
+        self.CutOffThresholdLabel.setObjectName(u"CutOffThresholdLabel")
+
+        self.CutOffThresholdLayout.addWidget(self.CutOffThresholdLabel)
+
+        self.CutOffThresholdSpinBox = QSpinBox(MenuWidget)
+        self.CutOffThresholdSpinBox.setObjectName(u"CutOffThresholdSpinBox")
+        self.CutOffThresholdSpinBox.setMaximum(100)
+
+        self.CutOffThresholdLayout.addWidget(self.CutOffThresholdSpinBox)
+
+
+        self.verticalLayout.addLayout(self.CutOffThresholdLayout)
+
+        self.line_2 = QFrame(MenuWidget)
+        self.line_2.setObjectName(u"line_2")
+        self.line_2.setFrameShape(QFrame.Shape.HLine)
+        self.line_2.setFrameShadow(QFrame.Shadow.Sunken)
+
+        self.verticalLayout.addWidget(self.line_2)
 
         self.ApplyButton = QPushButton(MenuWidget)
         self.ApplyButton.setObjectName(u"ApplyButton")
@@ -116,11 +151,11 @@ class Ui_MenuWidget(object):
 
     def retranslateUi(self, MenuWidget):
         MenuWidget.setWindowTitle(QCoreApplication.translate("MenuWidget", u"Form", None))
-        self.ImageLabel.setText(QCoreApplication.translate("MenuWidget", u"File: ", None))
-        self.ImageBrowseButton.setText(QCoreApplication.translate("MenuWidget", u"PushButton", None))
-        self.ToggleGridButton.setText(QCoreApplication.translate("MenuWidget", u"PushButton", None))
+        self.ImageFileLabel.setText(QCoreApplication.translate("MenuWidget", u"Image File:", None))
+        self.ImageBrowseButton.setText(QCoreApplication.translate("MenuWidget", u"Browse", None))
+        self.ToggleGridButton.setText(QCoreApplication.translate("MenuWidget", u"Disable Grid", None))
         self.GridColorLabel.setText(QCoreApplication.translate("MenuWidget", u"Current Grid Color:", None))
-        self.GridColorBrowseButton.setText(QCoreApplication.translate("MenuWidget", u"PushButton", None))
+        self.CutOffThresholdLabel.setText(QCoreApplication.translate("MenuWidget", u"Cut Off Threshold", None))
         self.ApplyButton.setText(QCoreApplication.translate("MenuWidget", u"Apply", None))
     # retranslateUi
 

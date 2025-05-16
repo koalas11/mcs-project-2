@@ -3,16 +3,15 @@ import sys
 from PySide6.QtCore import QSettings
 from PySide6.QtWidgets import QApplication
 
+from app.MainWindow import MainWindow
+
 # Main entry point of the application.
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    app.setOrganizationName("Datrix")
-    app.setOrganizationDomain("www.datrixgroup.com")
-    app.setApplicationName("SpectroscoPy")
+    app.setOrganizationName("SanvitoPellegrino")
+    app.setApplicationName("DCTApp")
     QSettings.setDefaultFormat(QSettings.Format.IniFormat)
-
-    from app.MainWindow import MainWindow
 
     main_window = MainWindow()
 

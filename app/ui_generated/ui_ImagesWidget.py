@@ -35,6 +35,8 @@ class Ui_ImagesWidget(object):
 
         self.MainLayout.addWidget(self.ProcessedImg)
 
+        self.MainLayout.setStretch(0, 1)
+        self.MainLayout.setStretch(1, 1)
 
         self.retranslateUi(ImagesWidget)
 

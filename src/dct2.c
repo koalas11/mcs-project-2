@@ -4,21 +4,19 @@
 #include <assert.h>
 #include <string.h>
 #include <math.h>
+#include <stdlib.h>
 
-#undef M_PI
-#define M_PI 3.14159265358979323846264338327950288
-
-typedef struct {
+typedef struct dct_context {
   size_t max_n;    // size of the largest transform we'll do
   double* scratch; // single buffer of length max_n
 } dct_context;
 
 // Allocate a context capable of handling up to `max_n`‑length transforms
 dct_context* dct_context_alloc(size_t max_n) {
-  dct_context* ctx = malloc(sizeof(dct_context));
+  dct_context* ctx = (dct_context*) malloc(sizeof(dct_context));
   if (!ctx) return NULL;
   ctx->max_n = max_n;
-  ctx->scratch = malloc(sizeof(double) * max_n);
+  ctx->scratch = (double*) malloc(sizeof(double) * max_n);
   if (!ctx->scratch) {
     free(ctx);
     return NULL;
@@ -49,14 +47,16 @@ int dct1d(dct_context* ctx,
   if (!ctx || !func || !out || stride == 0 || length > ctx->max_n)
     return -1;
 
+  double alpha_0 = 1.0 / sqrt((double)length);
+  double alpha_k = sqrt(2.0 / (double)length);
+
   double* T = ctx->scratch;
   for (size_t k = 0; k < length; ++k) {
     double sum = 0.0;
-    double alpha = (k == 0) ? 1.0 / sqrt((double)length)
-      : sqrt(2.0 / length);
+    double alpha = (k == 0) ? alpha_0 : alpha_k;
     for (size_t i = 0; i < length; ++i) {
       sum += func[i * stride]
-        * cos(k * M_PI * (2.0 * i + 1.0) / (2.0 * length));
+        * cos(k * M_PI * (2.0 * (double) i + 1.0) / (2.0 * (double) length));
     }
     T[k] = alpha * sum;
   }
@@ -76,15 +76,16 @@ int idct1d(dct_context* ctx,
   if (!ctx || !coeff || !out || stride == 0 || length > ctx->max_n)
     return -1;
 
+  double alpha_0 = 1.0 / sqrt((double)length);
+  double alpha_k = sqrt(2.0 / (double)length);
+
   double* T = ctx->scratch;
   for (size_t i = 0; i < length; ++i) {
     double sum = 0.0;
     for (size_t k = 0; k < length; ++k) {
-      double alpha = (k == 0) ? 1.0 / sqrt((double)length)
-        : sqrt(2.0 / length);
-      sum += coeff[k * stride]
-        * alpha
-        * cos(k * M_PI * (2.0 * i + 1.0) / (2.0 * length));
+      double alpha = (k == 0) ? alpha_0 : alpha_k;
+      sum += alpha * coeff[k * stride]
+        * cos(k * M_PI * (2.0 * (double)i + 1.0) / (2.0 * (double)length));
     }
     T[i] = sum;
   }
@@ -155,7 +156,8 @@ void _adj_block(size_t width, size_t height,
   *out_bh = (height + ny - 1) / ny;
 }
 
-int dct2dblk(dct_context* ctx,
+
+int dct2dblkrounded(dct_context* ctx,
   double* mat,
   size_t width,
   size_t height,
@@ -191,7 +193,7 @@ int dct2dblk(dct_context* ctx,
 }
 
 // iDCT 2D a blocchi “arrotondati”
-int idct2dblk(dct_context* ctx,
+int idct2dblkrounded(dct_context* ctx,
   double* mat,
   size_t width,
   size_t height,
@@ -218,6 +220,82 @@ int idct2dblk(dct_context* ctx,
       for (size_t j = 0; j < w; ++j) {
         double* col = mat + by * width + (bx + j);
         if (idct1d(ctx, col, h, width, col) < 0)
+          return -1;
+      }
+    }
+  }
+  return 0;
+}
+
+
+int dct2dblk(dct_context* ctx,
+  double* mat,
+  size_t width,
+  size_t height,
+  size_t blk_size) {
+  if (!ctx || !mat || blk_size == 0) return -1;
+  
+  // Verifica che la dimensione del blocco non superi la dimensione massima supportata
+  if (blk_size > ctx->max_n) return -1;
+  
+  // Calcola quanti blocchi completi possiamo fare in ogni dimensione
+  size_t num_blocks_x = width / blk_size; // Solo blocchi completi in larghezza
+  size_t num_blocks_y = height / blk_size; // Solo blocchi completi in altezza
+  
+  // Se non possiamo fare almeno un blocco completo, restituisci errore
+  if (num_blocks_x == 0 || num_blocks_y == 0) return -1;
+  
+  // Elabora solo i blocchi completi
+  for (size_t by = 0; by < num_blocks_y * blk_size; by += blk_size) {
+    for (size_t bx = 0; bx < num_blocks_x * blk_size; bx += blk_size) {
+      // DCT sulle righe del blocco
+      for (size_t i = 0; i < blk_size; ++i) {
+        double* row = mat + (by + i) * width + bx;
+        if (dct1d(ctx, row, blk_size, 1, row) < 0)
+          return -1;
+      }
+      // DCT sulle colonne del blocco
+      for (size_t j = 0; j < blk_size; ++j) {
+        double* col = mat + by * width + (bx + j);
+        if (dct1d(ctx, col, blk_size, width, col) < 0)
+          return -1;
+      }
+    }
+  }
+  return 0;
+}
+
+// iDCT 2D a blocchi completi (ignora blocchi parziali)
+int idct2dblk(dct_context* ctx,
+  double* mat,
+  size_t width,
+  size_t height,
+  size_t blk_size) {
+  if (!ctx || !mat || blk_size == 0) return -1;
+  
+  // Verifica che la dimensione del blocco non superi la dimensione massima supportata
+  if (blk_size > ctx->max_n) return -1;
+  
+  // Calcola quanti blocchi completi possiamo fare in ogni dimensione
+  size_t num_blocks_x = width / blk_size; // Solo blocchi completi in larghezza
+  size_t num_blocks_y = height / blk_size; // Solo blocchi completi in altezza
+  
+  // Se non possiamo fare almeno un blocco completo, restituisci errore
+  if (num_blocks_x == 0 || num_blocks_y == 0) return -1;
+  
+  // Elabora solo i blocchi completi
+  for (size_t by = 0; by < num_blocks_y * blk_size; by += blk_size) {
+    for (size_t bx = 0; bx < num_blocks_x * blk_size; bx += blk_size) {
+      // iDCT sulle righe del blocco
+      for (size_t i = 0; i < blk_size; ++i) {
+        double* row = mat + (by + i) * width + bx;
+        if (idct1d(ctx, row, blk_size, 1, row) < 0)
+          return -1;
+      }
+      // iDCT sulle colonne del blocco
+      for (size_t j = 0; j < blk_size; ++j) {
+        double* col = mat + by * width + (bx + j);
+        if (idct1d(ctx, col, blk_size, width, col) < 0)
           return -1;
       }
     }

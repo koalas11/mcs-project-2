@@ -14,10 +14,10 @@ if not defined VSCMD_VER (
     echo Visual Studio environment variables are already set. Skipping vcvars64.bat.
 )
 
-REM Navigate to build_windows directory and build the project
-echo Building project in build_windows directory...
-if not exist build_windows mkdir build_windows
-cd build_windows
+REM Navigate to build directory and build the project
+echo Building project in build directory...
+if not exist build mkdir build
+cd build
 cmake ..
 if %ERRORLEVEL% NEQ 0 (
     cd ..
