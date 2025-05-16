@@ -73,6 +73,7 @@ class DCT2Handler(QObject):
         matrix = np.ascontiguousarray(matrix.astype(dtype=np.float64))
 
         ctx = self.lib.dct_context_alloc(ctypes.c_size_t(block_size))
+
         block_size_t = ctypes.c_size_t(block_size)
 
         width = ctypes.c_size_t(matrix.shape[1])
@@ -104,6 +105,8 @@ class DCT2Handler(QObject):
         matrix_new = matrix.round().clip(0, 255).astype(dtype=old_type)
         self.sig_img_processed.emit(matrix_new)
         sig_toggle.emit(Progress.FINISHED)
+
+        self.lib.dct_context_free(ctx)
 
         return
 

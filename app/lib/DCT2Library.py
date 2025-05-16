@@ -1,5 +1,6 @@
 import ctypes
 import os
+import platform
 from types import NoneType
 from typing import Callable, TypeAlias
 
@@ -43,7 +44,15 @@ class DCT2Library(ctypes.CDLL):
 
 
     def __init__(self):
-        super().__init__(os.path.join(os.getcwd(), "target", "dct2.dll"))
+
+        plat = platform.system()
+        library_name = "libdct2.so"
+        if plat == "Windows":
+            library_name = "dct2.dll"
+        elif plat == "Darwin":
+            library_name = "libdct2.dylib"
+
+        super().__init__(os.path.join(os.getcwd(), "build", library_name))
         method_name: str
         call_method: Callable
         for method_name, call_method in vars(type(self))["__annotations__"].items():
