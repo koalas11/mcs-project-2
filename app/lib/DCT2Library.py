@@ -42,17 +42,13 @@ class DCT2Library(ctypes.CDLL):
     dct2dblk: Callable[[DCTContextPtr, DoublePtr, SIZE_T, SIZE_T, SIZE_T], INT]
     idct2dblk: Callable[[DCTContextPtr, DoublePtr, SIZE_T, SIZE_T, SIZE_T], INT]
 
+    dct2dblkrounded: Callable[[DCTContextPtr, DoublePtr, SIZE_T, SIZE_T, SIZE_T], INT]
+    idct2dblkrounded: Callable[[DCTContextPtr, DoublePtr, SIZE_T, SIZE_T, SIZE_T], INT]
+
 
     def __init__(self):
 
-        plat = platform.system()
-        library_name = "libdct2.so"
-        if plat == "Windows":
-            library_name = "dct2.dll"
-        elif plat == "Darwin":
-            library_name = "libdct2.dylib"
-
-        super().__init__(os.path.join(os.getcwd(), "build", library_name))
+        super().__init__(os.path.join(os.getcwd(), "target", "dct2"))
         method_name: str
         call_method: Callable
         for method_name, call_method in vars(type(self))["__annotations__"].items():

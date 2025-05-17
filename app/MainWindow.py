@@ -48,9 +48,9 @@ class MainWindow(QMainWindow):
 
         self.images_handler.sig_update_original_img.connect(self.images_widget.load_image)
         self.images_handler.sig_update_processed_img.connect(self.images_widget.load_processed_image)
-        self.images_handler.sig_process_img_update.connect(self.images_widget.on_progress_update)
-        self.images_handler.sig_process_img_update.connect(self.menu_widget.on_progress_update)
-        self.images_handler.sig_process_img.connect(self.dct2_handler.dct)
+        self.dct2_handler.sig_img_processing_updates.connect(self.images_widget.on_progress_update)
+        self.dct2_handler.sig_img_processing_updates.connect(self.menu_widget.on_progress_update)
+        self.images_handler.sig_process_img.connect(self.dct2_handler.compress)
 
         self.menu_widget.sig_grid_changed.connect(self.images_widget.on_grid_changed)
         self.menu_widget.sig_apply_button_clicked.connect(self.images_handler.start_processing)

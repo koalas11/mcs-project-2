@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.10)
 
 project(DCT2 LANGUAGES C)
 
-find_package(GSL REQUIRED)
-
 # Define directories
 set(SRC_DIR "${CMAKE_SOURCE_DIR}/src")
 set(LIB_DIR "${CMAKE_SOURCE_DIR}/lib")
@@ -23,12 +21,13 @@ set_target_properties(dct2 PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_RELEASE "${BIN_DIR}"
     RUNTIME_OUTPUT_DIRECTORY_DEBUG "${BIN_DIR}"
 
+    LIBRARY_OUTPUT_DIRECTORY "${BIN_DIR}"
+
     C_STANDARD 17
     C_STANDARD_REQUIRED YES
 )
 
 target_include_directories(dct2 PRIVATE ${SRC_DIR})
-target_link_libraries(dct2 GSL::gsl GSL::gslcblas)
 
 if(MSVC)
     target_compile_options(dct2 PRIVATE /W4)

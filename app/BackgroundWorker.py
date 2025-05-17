@@ -20,8 +20,6 @@ class BackgroundWorker(QObject):
         Convert a PIL image to a numpy array.
         """
         try:
-            print("BackGroundWorker: convert_img_to_array")
-            print("Current thread:", QThread.currentThread())
             if image_file is not None:
                 image_arr = np.array(Image.open(image_file))
                 self.sig_img_converted.emit(0, image_arr)

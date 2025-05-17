@@ -18,8 +18,7 @@ class ImagesHandler(QObject):
     sig_update_original_img = Signal(np.ndarray)
     sig_update_processed_img = Signal(np.ndarray)
 
-    sig_process_img = Signal(np.ndarray, int, int, Signal)
-    sig_process_img_update = Signal(Progress)
+    sig_process_img = Signal(np.ndarray, int, int)
 
     def __init__(self, parent=None):
         super(ImagesHandler, self).__init__(parent)
@@ -42,7 +41,7 @@ class ImagesHandler(QObject):
         """Process the loaded image using the provided function."""
         if self.original_img_arr is not None:
             self.tmp_img_arr = np.copy(self.original_img_arr)
-            self.sig_process_img.emit(self.tmp_img_arr, MenuWidget.block_size, MenuWidget.cut_off_threshold, self.sig_process_img_update)
+            self.sig_process_img.emit(self.tmp_img_arr, MenuWidget.block_size, MenuWidget.cut_off_threshold)
         else:
             raise ValueError("No image loaded to process.")
 

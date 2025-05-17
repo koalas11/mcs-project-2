@@ -82,12 +82,11 @@ DCT_API int idct1d(dct_context* ctx,
   double* T = ctx->scratch;
   for (size_t i = 0; i < length; ++i) {
     double sum = 0.0;
-    for (size_t k = 0; k < length; ++k) {
-      double alpha = (k == 0) ? alpha_0 : alpha_k;
-      sum += alpha * coeff[k * stride]
+    for (size_t k = 1; k < length; ++k) {
+      sum += coeff[k * stride]
         * cos(k * M_PI * (2.0 * (double)i + 1.0) / (2.0 * (double)length));
     }
-    T[i] = sum;
+    T[i] = sum * alpha_k + coeff[0] * alpha_0;
   }
   for (size_t i = 0; i < length; ++i) {
     out[i * stride] = T[i];
