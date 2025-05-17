@@ -2,5 +2,7 @@
     "tinymist.lint.enabled": true,
     "[typst]": {
         "editor.formatOnSave": true
-    }
+    },
+    "glsllint.glslangValidatorArgs": ["-V100", "--target-env", "vulkan1.2"],
+    
 }

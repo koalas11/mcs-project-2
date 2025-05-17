@@ -1,0 +1,51 @@
+#version 450
+layout(local_size_x=16, local_size_y=1) in;
+
+// push constants: width, height, forward/inverse
+layout(push_constant) uniform PC {
+    int width;
+    int height;
+    int isInverse;    // 0 = forward, 1 = inverse
+} pc;
+
+// binding 0: input image (sampled)
+// binding 1: storage image (write-only) per output intermedio
+layout(binding=0) uniform sampler2D  srcTex;
+layout(binding=1, rgba32f) writeonly uniform image2D tmpTex;
+
+const float PI = 3.14159265359;
+
+// alpha(k,N) normalization
+float alpha(int k, int N) {
+    return (k==0) ? (1.0/sqrt(float(N))) : sqrt(2.0/float(N));
+}
+
+// Calcola DCT-II o DCT-III su una riga y
+void main() {
+    int y = int(gl_GlobalInvocationID.y);
+    int v = int(gl_GlobalInvocationID.x);
+    if (y >= pc.height || v >= pc.width) return;
+
+    float sum = 0.0;
+    // if (pc.isInverse == 0) {
+    //     // forward: somma su x -> frequenze v
+    //     for (int x = 0; x < pc.width; ++x) {
+    //         float f = texelFetch(srcTex, ivec2(x,y), 0).r;
+    //         sum += f * cos(PI*(2.0*float(x)+1.0)*float(v)/(2.0*float(pc.width)));
+    //     }
+    // } else {
+    //     // inverse: somma su frequenze k -> spazio x
+    //     for (int k = 0; k < pc.width; ++k) {
+    //         float C = texelFetch(srcTex, ivec2(k,y), 0).r;
+    //         sum += C * cos(PI*(2.0*float(v)+1.0)*float(k)/(2.0*float(pc.width)));
+    //     }
+    // }
+
+    for (int i = 0; i < pc.width; ++i) {
+        float coseno = (1 - pc.isInverse) * cos(PI*(2.0*float(i)+1.0)*float(v)/(2.0*float(pc.width)))
+                        + pc.isInverse * cos(PI*(2.0*float(v)+1.0)*float(i)/(2.0*float(pc.width)));
+        sum += texelFetch(srcTex, ivec2(i,y), 0).r * coseno;
+    }
+    float a = alpha(v, pc.width);
+    imageStore(tmpTex, ivec2(v,y), vec4(a * sum, 0.0, 0.0, 1.0));
+}

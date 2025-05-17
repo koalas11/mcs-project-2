@@ -2,6 +2,12 @@ cmake_minimum_required(VERSION 3.10)
 
 project(DCT2 LANGUAGES C)
 
+if(APPLE)
+    set(VulkanComponents MoltenVK)
+endif()
+
+find_package(Vulkan COMPONENTS ${VulkanComponents})
+
 # Define directories
 set(SRC_DIR "${CMAKE_SOURCE_DIR}/src")
 set(LIB_DIR "${CMAKE_SOURCE_DIR}/lib")
@@ -28,6 +34,10 @@ set_target_properties(dct2 PROPERTIES
 )
 
 target_include_directories(dct2 PRIVATE ${SRC_DIR})
+if(Vulkan_FOUND)
+    target_compile_definitions(dct2 PRIVATE HAS_VULKAN)
+    target_link_libraries(dct2 Vulkan::Vulkan Vulkan::MoltenVK)
+endif()
 
 if(MSVC)
     target_compile_options(dct2 PRIVATE /W4)

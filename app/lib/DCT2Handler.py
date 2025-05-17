@@ -5,6 +5,8 @@ import numpy as np
 from PySide6.QtCore import QObject, QThread, Slot, Signal
 from scipy.fftpack import dctn, idctn
 
+import sys
+
 
 from .DCT2Library import DCT2Library, DoublePtr
 
@@ -94,6 +96,13 @@ class DCT2Handler(QObject):
         block_size_t = ctypes.c_size_t(block_size)
 
         ctx = self.lib.dct_context_alloc(block_size_t)
+        result = self.lib.dct_init(ctx)
+
+        sys.stderr.flush()
+
+        if result != 0:
+            self.sig_img_processing_updates.emit(Progress.ERROR)
+            return
 
         height = ctypes.c_size_t(matrix.shape[0])
         width = ctypes.c_size_t(matrix.shape[1])
@@ -114,6 +123,7 @@ class DCT2Handler(QObject):
             self.sig_img_processing_updates.emit(Progress.ERROR)
             return
 
+        self.lib.dct_shutdown(ctx)
         self.lib.dct_context_free(ctx)
 
     def apply_cutoff_to_blocks(

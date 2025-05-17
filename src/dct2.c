@@ -1,3 +1,4 @@
+#ifndef HAS_VULKAN
 #include "dct2.h"
 
 // #include <gsl/gsl_integration.h>
@@ -301,3 +302,4 @@ DCT_API int idct2dblk(dct_context* ctx,
   }
   return 0;
 }
+#endif

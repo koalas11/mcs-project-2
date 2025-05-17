@@ -1,0 +1,47 @@
+#version 450
+layout(local_size_x=16, local_size_y=1) in;
+
+layout(push_constant) uniform PC {
+    int width;
+    int height;
+    int isInverse;    // 0 = forward, 1 = inverse
+} pc;
+
+layout(binding=0) uniform sampler2D  tmpTex;   // output intermedio
+layout(binding=1, rgba32f) writeonly uniform image2D dstTex; // output finale
+
+const float PI = 3.14159265359;
+float alpha(int k, int N) {
+    return (k==0) ? (1.0/sqrt(float(N))) : sqrt(2.0/float(N));
+}
+
+void main() {
+    int x = int(gl_GlobalInvocationID.y);
+    int u = int(gl_GlobalInvocationID.x);
+    if (x >= pc.height || u >= pc.width) return;
+
+    float sum = 0.0;
+
+    // if (pc.isInverse == 0) {
+    //     // forward: somma su y -> frequenze u
+    //     for (int y = 0; y < pc.height; ++y) {
+    //         float f = texelFetch(tmpTex, ivec2(u,y), 0).r;
+    //         sum += f * cos(PI*(2.0*float(y)+1.0)*float(u)/(2.0*float(pc.height)));
+    //     }
+    // } else {
+    //     // inverse: somma su frequenze k -> spazio y
+    //     for (int k = 0; k < pc.height; ++k) {
+    //         float C = texelFetch(tmpTex, ivec2(u,k), 0).r;
+    //         sum += C * cos(PI*(2.0*float(x)+1.0)*float(k)/(2.0*float(pc.height)));
+    //     }
+    // }
+    
+    for (int i = 0; i < pc.height; ++i) {
+        float coseno = (1 - pc.isInverse) * cos(PI*(2.0*float(i)+1.0)*float(u)/(2.0*float(pc.height)))
+                        + pc.isInverse * cos(PI*(2.0*float(x)+1.0)*float(i)/(2.0*float(pc.height)));
+        sum += texelFetch(tmpTex, ivec2(u,i), 0).r * coseno;
+    }
+
+    float a = alpha(u, pc.height);
+    imageStore(dstTex, ivec2(u,x), vec4(a * sum, 0.0, 0.0, 1.0));
+}
