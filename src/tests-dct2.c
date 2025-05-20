@@ -1,13 +1,20 @@
+#include "dct2.h"
+#include "fftw-dct2.h"
+
 #include <stdio.h>
-#include <dct2.h>
-#include <fftw-dct2.h>
+#ifdef _WIN32
 #include <malloc.h>
+#else
+#include <stdlib.h>
+#include <memory.h>
+#endif
+
 #include <math.h>
 
 #define N 8
 
 
-int main() {
+int main(void) {
     dct_context* ctx = dct_context_alloc(N * N);
 
     double matrix[N * N] = {
@@ -105,20 +112,24 @@ int main() {
     printf("DCT2 FFTW completata!\n");
     // Esegui la iDCT2 FFTW
     printf("Eseguendo la iDCT2 FFTW...\n");
-    compute_fftw_idct2d(matrix_fftw_out, matrix_fftw_out, N, N);
+    double* matrix_fftw_out2 = (double*)malloc(N * N * sizeof(double));
+    memcpy(matrix_fftw_out2, matrix, N * N * sizeof(double));
+    compute_fftw_idct2d(matrix_fftw_out, matrix_fftw_out2, N, N);
 
     if (result != 0) {
         printf("Errore durante la iDCT2 FFTW\n");
         free(matrix_fftw_out);
-        return;
+        free(matrix_fftw_out2);
+        return -1;
     }
 
     // Confronta i risultati
     printf("Comparando i risultati...\n");
     for (int i = 0; i < N * N; i++) {
-        if (fabs(matrix_fftw_out[i] - matrix[i]) > 1e-1) {
-            printf("Errore alla posizione %d: atteso %f, ottenuto %f\n", i, matrix[i], matrix_fftw_out[i]);
+        if (fabs(matrix_fftw_out2[i] - matrix[i]) > 1e-1) {
+            printf("Errore alla posizione %d: atteso %f, ottenuto %f\n", i, matrix[i], matrix_fftw_out2[i]);
             free(matrix_fftw_out);
+            free(matrix_fftw_out2);
             return -1;
         }
     }
@@ -126,6 +137,7 @@ int main() {
     printf("Comparazione iDCT2 FFTW completata!\n");
     
     free(matrix_fftw_out);
+    free(matrix_fftw_out2);
 
     printf("Tutti i test sono stati superati con successo!\n");
     return 0;

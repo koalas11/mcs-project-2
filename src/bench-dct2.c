@@ -19,7 +19,7 @@ void fill_random_contiguous(double *mat, int n) {
         mat[i] = (double)rand() / RAND_MAX;
 }
 
-int main() {
+int main(void) {
     FILE *csv = fopen("bench.csv", "w");
     if (!csv) {
         perror("Cannot open CSV file");

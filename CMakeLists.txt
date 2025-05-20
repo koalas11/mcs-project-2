@@ -96,15 +96,23 @@ else()
     target_compile_options(dct2_test PRIVATE -Wall -Wextra -pedantic)
 endif()
 
-target_link_libraries(dct2_bench PRIVATE
-    ${LIB_DIR}/libfftw3-3.lib
-    ${LIB_DIR}/libfftw3f-3.lib
-)
-target_include_directories(dct2_bench PRIVATE "${LIB_DIR}" "${SRC_DIR}")
+if(WIN32)
+    target_link_libraries(dct2_bench PRIVATE
+        ${LIB_DIR}/libfftw3-3.lib
+        ${LIB_DIR}/libfftw3f-3.lib
+    )
+    target_include_directories(dct2_bench PRIVATE "${LIB_DIR}" "${SRC_DIR}")
 
-target_include_directories(dct2_test PRIVATE )
-target_link_libraries(dct2_test PRIVATE
-    ${LIB_DIR}/libfftw3-3.lib
-    ${LIB_DIR}/libfftw3f-3.lib
-)
-target_include_directories(dct2_test PRIVATE "${LIB_DIR}" "${SRC_DIR}")
+    target_include_directories(dct2_test PRIVATE )
+    target_link_libraries(dct2_test PRIVATE
+        ${LIB_DIR}/libfftw3-3.lib
+        ${LIB_DIR}/libfftw3f-3.lib
+    )
+    target_include_directories(dct2_test PRIVATE "${LIB_DIR}" "${SRC_DIR}")
+else()
+    target_link_libraries(dct2_bench PRIVATE fftw3)
+    target_include_directories(dct2_bench PRIVATE)
+
+    target_include_directories(dct2_test PRIVATE )
+    target_link_libraries(dct2_test PRIVATE fftw3)
+endif()

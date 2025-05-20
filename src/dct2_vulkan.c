@@ -7,7 +7,12 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+#ifdef _WIN32
 #include <malloc.h>
+#else
+#include <memory.h>
+#endif
 
 #include <vulkan/vulkan.h>
 
