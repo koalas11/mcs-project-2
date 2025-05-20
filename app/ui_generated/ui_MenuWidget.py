@@ -23,7 +23,7 @@ class Ui_MenuWidget(object):
     def setupUi(self, MenuWidget):
         if not MenuWidget.objectName():
             MenuWidget.setObjectName(u"MenuWidget")
-        MenuWidget.resize(400, 300)
+        MenuWidget.resize(401, 300)
         self.verticalLayout = QVBoxLayout(MenuWidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.ImageFileLabel = QLabel(MenuWidget)
@@ -145,8 +145,6 @@ class Ui_MenuWidget(object):
 
 
         self.retranslateUi(MenuWidget)
-
-        QMetaObject.connectSlotsByName(MenuWidget)
     # setupUi
 
     def retranslateUi(self, MenuWidget):

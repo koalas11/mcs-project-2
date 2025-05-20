@@ -7,6 +7,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <malloc.h>
 
 #include <vulkan/vulkan.h>
 
@@ -46,19 +47,28 @@ typedef struct PushConstants {
   uint32_t isInverse;
 } PushConstants;
 
-const size_t VALIDATION_LAYERS_COUNT = 1;
+#define VALIDATION_LAYERS_COUNT 1
 const char* VALIDATION_LAYERS[VALIDATION_LAYERS_COUNT] = {
   "VK_LAYER_KHRONOS_validation"
 };
-const size_t REQUIRED_EXTENSIONS_COUNT = 1;
+
+#if defined(_WIN32)
+#define REQUIRED_EXTENSIONS_COUNT 0
+const char* REQUIRED_EXTENSIONS = NULL;
+
+#define REQUIRED_DEVICE_EXTENSIONS_COUNT 0
+const char* REQUIRED_DEVICE_EXTENSIONS = NULL;
+#else
+#define REQUIRED_EXTENSIONS_COUNT 1
 const char* REQUIRED_EXTENSIONS[REQUIRED_EXTENSIONS_COUNT] = {
   "VK_KHR_portability_enumeration",
 };
 
-const size_t REQUIRED_DEVICE_EXTENSIONS_COUNT = 1;
+#define REQUIRED_DEVICE_EXTENSIONS_COUNT 1
 const char* REQUIRED_DEVICE_EXTENSIONS[REQUIRED_DEVICE_EXTENSIONS_COUNT] = {
   "VK_KHR_portability_subset",
 };
+#endif
 
 DCT_API dct_context* dct_context_alloc(size_t max_n) {
   dct_context* ctx = (dct_context*)malloc(sizeof(dct_context));
@@ -97,7 +107,9 @@ int dct_init(dct_context* ctx) {
     .ppEnabledLayerNames = VALIDATION_LAYERS,
     .enabledExtensionCount = REQUIRED_EXTENSIONS_COUNT,
     .ppEnabledExtensionNames = REQUIRED_EXTENSIONS,
+    #ifndef _WIN32
     .flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR,
+    #endif
   };
 
   VkResult res = vkCreateInstance(&istCInfo, NULL, &ctx->instance);
@@ -108,7 +120,7 @@ int dct_init(dct_context* ctx) {
   }
 
   // Get GPU
-  uint32_t devCount;
+  uint32_t devCount = 0;
   res = vkEnumeratePhysicalDevices(ctx->instance, &devCount, NULL);
   if (res != VK_SUCCESS) {
     fprintf(stderr, "[ERROR] Failed to enumerate Physical Devices (%d)\n", res);
@@ -120,8 +132,9 @@ int dct_init(dct_context* ctx) {
     return -2;
   }
   fprintf(stderr, "Found %u GPUs\n", devCount);
-
-  VkPhysicalDevice devices[devCount];
+  
+  VkPhysicalDevice device;
+  VkPhysicalDevice* devices = malloc(devCount * sizeof(VkPhysicalDevice));
   vkEnumeratePhysicalDevices(ctx->instance, &devCount, devices);
 
   ctx->gpu = devices[0];
@@ -139,11 +152,15 @@ int dct_init(dct_context* ctx) {
     }
   }
 
+  device = memcpy(ctx->gpu, devices[0], sizeof(VkPhysicalDevice));
+  ctx->gpu = device;
+  free(devices);
+
   // Verify GPU can compute
   uint32_t qfCount;
   vkGetPhysicalDeviceQueueFamilyProperties(ctx->gpu, &qfCount, NULL);
 
-  VkQueueFamilyProperties families[qfCount];
+  VkQueueFamilyProperties* families = (VkQueueFamilyProperties*)malloc(qfCount * sizeof(VkQueueFamilyProperties));
   vkGetPhysicalDeviceQueueFamilyProperties(ctx->gpu, &qfCount, families);
 
   for (uint32_t i = 0; i < qfCount; i++) {
@@ -151,6 +168,8 @@ int dct_init(dct_context* ctx) {
       ctx->computeQueueIndex = i;
     }
   }
+
+  free(families);
 
   // Create logical device
   float priority = 1.0f;
@@ -226,18 +245,18 @@ int dct_init(dct_context* ctx) {
     return -1;
   }
 
-  const uint32_t pipelineCount = 2;
+  #define pipelineCount 2
   VkShaderModuleCreateInfo shaderInfos[pipelineCount] = {
     {
-    .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-    .pCode = (uint32_t*)dct_horiz_comp,
-    .codeSize = dct_horiz_comp_size,
-  },
+      .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
+      .pCode = (uint32_t*)dct_horiz_comp,
+      .codeSize = dct_horiz_comp_size,
+    },
     {
-    .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-    .pCode = (uint32_t*)dct_vert_comp,
-    .codeSize = dct_vert_comp_size,
-  },
+      .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
+      .pCode = (uint32_t*)dct_vert_comp,
+      .codeSize = dct_vert_comp_size,
+    },
   };
 
   res = vkCreateShaderModule(ctx->device, shaderInfos, NULL, &ctx->programs.shaderDCT2DHorizontal);
@@ -263,8 +282,8 @@ int dct_init(dct_context* ctx) {
     .size = sizeof(PushConstants),
   };
 
-  const uint32_t bindingCount = 2;
-  VkDescriptorSetLayoutBinding bindings[bindingCount] = {
+  #define bindingCountSS 2
+  VkDescriptorSetLayoutBinding bindings[bindingCountSS] = {
     {
       .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
       .binding = 0,
@@ -281,7 +300,7 @@ int dct_init(dct_context* ctx) {
 
   VkDescriptorSetLayoutCreateInfo setLayoutInfo = {
     .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-    .bindingCount = bindingCount,
+    .bindingCount = bindingCountSS,
     .pBindings = bindings,
   };
 
@@ -446,13 +465,13 @@ DCT_API int dct2d(dct_context* ctx,
   vkCreateBuffer(ctx->device, &bufInfo, NULL, &stagingBuffer);
 
   VkMemoryRequirements memReq;
-  vkGetBufferMemoryRequirements(ctx->device, &stagingBuffer, &memReq);
+  vkGetBufferMemoryRequirements(ctx->device, stagingBuffer, &memReq);
 
   uint32_t memoryTypeIndex = 0;
   VkPhysicalDeviceMemoryProperties memProperties;
   vkGetPhysicalDeviceMemoryProperties(ctx->gpu, &memProperties);
   for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
-    if ((memReq.memoryTypeBits & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT) == VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT) {
+    if ((memReq.memoryTypeBits & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT) == (VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)) {
       memoryTypeIndex = i;
       break;
     }
@@ -474,7 +493,7 @@ DCT_API int dct2d(dct_context* ctx,
     .dstOffset = 0,
     .size = size,
   }; // TODO: VkImageBufferCopy
-  vkCmdCopyBufferToImage(ctx->cmd, &stagingBuffer, NULL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, &copyRegion); // TODO: sistemare i buffer e img
+  vkCmdCopyBufferToImage(ctx->cmd, stagingBuffer, NULL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, &copyRegion); // TODO: sistemare i buffer e img
 
   // TODO: LA ROBA SOPRA UN PO MERDA
   // TODO: LA ROBA SOPRA UN PO MERDA
@@ -492,8 +511,8 @@ DCT_API int dct2d(dct_context* ctx,
   // vkCmdBindDescriptorSets(ctx->cmd, VK_PIPELINE_BIND_POINT_COMPUTE, ctx->programs.layout, 0, 1, &ctx->programs.firstPassDescriptor, 0, NULL);
 
   PushConstants pc = {
-    .width = width,
-    .height = height,
+    .width = (uint32_t) width,
+    .height = (uint32_t) height,
     .isInverse = 0,
   };
   vkCmdPushConstants(ctx->cmd, ctx->programs.layout, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(pc), &pc);

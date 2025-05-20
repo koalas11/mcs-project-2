@@ -4,3 +4,4 @@ __pycache__
 old/
 build/
 target/
+lib/

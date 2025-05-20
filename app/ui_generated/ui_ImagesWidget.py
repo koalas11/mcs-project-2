@@ -39,8 +39,6 @@ class Ui_ImagesWidget(object):
         self.MainLayout.setStretch(1, 1)
 
         self.retranslateUi(ImagesWidget)
-
-        QMetaObject.connectSlotsByName(ImagesWidget)
     # setupUi
 
     def retranslateUi(self, ImagesWidget):

@@ -4,5 +4,6 @@
         "editor.formatOnSave": true
     },
     "glsllint.glslangValidatorArgs": ["-V100", "--target-env", "vulkan1.2"],
-    
+    "tinymist.exportPdf": "never",
+    "tinymist.preview.refresh": "onSave",
 }

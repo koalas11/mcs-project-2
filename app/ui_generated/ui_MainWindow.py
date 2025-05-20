@@ -30,8 +30,6 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.MainWidget)
 
         self.retranslateUi(MainWindow)
-
-        QMetaObject.connectSlotsByName(MainWindow)
     # setupUi
 
     def retranslateUi(self, MainWindow):
