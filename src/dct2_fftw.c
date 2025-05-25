@@ -92,14 +92,15 @@ DCT_API int dct1d(dct_context* ctx,
   fftw_plan plan;
   fftw_r2r_kind kind = FFTW_REDFT10;
 
-  plan = fftw_plan_many_r2r(1, (const int *)&length, 1, in, NULL, 1, 0, tmp, NULL, 1, 0, &kind, FFTW_ESTIMATE);
+  plan = fftw_plan_many_r2r(1, (const int*)&length, 1, in, NULL, stride, 1, tmp, NULL, stride, 1, &kind, FFTW_ESTIMATE);
 
   fftw_execute(plan);
 
-  fftw_destroy_plan(plan);
-  fftw_cleanup();
-
   memcpy(out, tmp, length * sizeof(double));
+
+  fftw_destroy_plan(plan);
+  fftw_free(tmp);
+  fftw_cleanup();
 
   normalize_dct1d_ortho(out, length);
 
@@ -120,14 +121,15 @@ DCT_API int idct1d(dct_context* ctx,
 
   normalize_idct1d_ortho(in, length);
 
-  plan = fftw_plan_many_r2r(1, (const int *)&length, 1, in, NULL, 1, 0, tmp, NULL, 1, 0, &kind, FFTW_ESTIMATE);
+  plan = fftw_plan_many_r2r(1, (const int*)&length, 1, in, NULL, stride, 1, tmp, NULL, stride, 1, &kind, FFTW_ESTIMATE);
 
   fftw_execute(plan);
 
-  fftw_destroy_plan(plan);
-  fftw_cleanup();
-
   memcpy(out, tmp, length * sizeof(double));
+
+  fftw_destroy_plan(plan);
+  fftw_free(tmp);
+  fftw_cleanup();
 
   normalize_fftw_1d(out, length);
 
@@ -138,16 +140,47 @@ DCT_API int dct2d(dct_context* ctx,
   double* matrix,
   size_t width,
   size_t height) {
-  fprintf(stderr, "Not implemented: %zu, %zu for pointer at 0x%lx\n", width, height, (uintptr_t)&matrix);
-  return -1;
+  double* tmp = fftw_alloc_real(width * height);
+
+  fftw_plan plan;
+
+  plan = fftw_plan_r2r_2d(width, height, matrix, tmp, FFTW_REDFT10, FFTW_REDFT10, FFTW_ESTIMATE);
+
+  fftw_execute(plan);
+
+  memcpy(matrix, tmp, width * height * sizeof(double));
+
+  fftw_destroy_plan(plan);
+  fftw_free(tmp);
+  fftw_cleanup();
+
+  normalize_dct2d_ortho(matrix, width, height);
+
+  return 0;
 }
 
 DCT_API int idct2d(dct_context* ctx,
   double* matrix,
   size_t width,
   size_t height) {
-  fprintf(stderr, "Not implemented: %zu, %zu for pointer at 0x%lx\n", width, height, (uintptr_t)&matrix);
-  return -1;
+  double* tmp = fftw_alloc_real(width * height);
+  fftw_plan plan;
+
+  normalize_idct2d_ortho(matrix, width, height);
+
+  plan = fftw_plan_r2r_2d(width, height, matrix, tmp, FFTW_REDFT01, FFTW_REDFT01, FFTW_ESTIMATE);
+
+  fftw_execute(plan);
+
+  memcpy(matrix, tmp, width * height * sizeof(double));
+
+  fftw_destroy_plan(plan);
+  fftw_free(tmp);
+  fftw_cleanup();
+
+  normalize_fftw_2d(matrix, width, height);
+
+  return 0;
 }
 
 DCT_API int dct2dblk(dct_context* ctx,
