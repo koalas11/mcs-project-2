@@ -4,7 +4,7 @@
 #include <math.h>
 
 
-void normalize(double* data, int width, int height) {
+void normalize_fftw_2d(double* data, int width, int height) {
     double scale = 4 * width * height;
     for (int i = 0; i < width * height; i++) {
         data[i] = data[i] / scale;
@@ -63,5 +63,5 @@ void compute_fftw_idct2d(double* in, double* out, int width, int height) {
     fftw_cleanup();
 
     // normalize_idct2_ortho(out, width, height);
-    normalize(out, width, height);
+    normalize_fftw_2d(out, width, height);
 }

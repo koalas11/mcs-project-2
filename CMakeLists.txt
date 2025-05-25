@@ -2,11 +2,17 @@ cmake_minimum_required(VERSION 3.10)
 
 project(DCT2 LANGUAGES C)
 
-if(APPLE)
-    set(VulkanComponents MoltenVK)
+# Compiler options
+if (MSVC)
+    # warning level 4
+    add_compile_options(/W4)
+    add_compile_definitions(_USE_MATH_DEFINES)
+else()
+    # additional warnings
+    add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-find_package(Vulkan COMPONENTS ${VulkanComponents})
+set(FORCE_SLOW false)
 
 # Define directories
 set(SRC_DIR "${CMAKE_SOURCE_DIR}/src")
@@ -33,7 +39,12 @@ set_target_properties(dct2 PROPERTIES
     C_STANDARD_REQUIRED YES
     C_EXTENSIONS ON
 )
+target_include_directories(dct2 PUBLIC ${SRC_DIR})
+target_compile_definitions(dct2 PRIVATE
+    DLL_EXPORT
+)
 
+# Aggiungi l'eseguibile di benchmark
 file(GLOB_RECURSE FFTW_FILES "${SRC_DIR}/fftw*.c")
 add_executable(dct2_bench "${SRC_FILES}" "${FFTW_FILES}" "${SRC_DIR}/bench-dct2.c")
 set_target_properties(dct2_bench PROPERTIES
@@ -48,7 +59,10 @@ set_target_properties(dct2_bench PROPERTIES
     C_STANDARD_REQUIRED YES
     C_EXTENSIONS ON
 )
+target_include_directories(dct2_bench PRIVATE ${SRC_DIR})
 
+
+# Aggiungi l'eseguibile di test
 add_executable(dct2_test "${SRC_FILES}" "${FFTW_FILES}" "${SRC_DIR}/tests-dct2.c")
 set_target_properties(dct2_test PROPERTIES
     OUTPUT_NAME "dct2_test"
@@ -62,57 +76,60 @@ set_target_properties(dct2_test PROPERTIES
     C_STANDARD_REQUIRED YES
     C_EXTENSIONS ON
 )
+target_include_directories(dct2_test PRIVATE ${SRC_DIR})
 
-target_include_directories(dct2 PRIVATE ${SRC_DIR})
+
+find_package(fftw3)
+if(fftw3_FOUND)
+    message("fftw3 found:")
+    message("   -- lib: " ${FFTW3_LIBRARIES})
+    message("   -- include dirs: " ${FFTW3_INCLUDE_DIRS})
+    message("   -- lib dirs: " ${FFTW3_LIBRARY_DIRS})
+
+    if (NOT FORCE_SLOW)
+        add_compile_definitions(HAS_FFTW)
+    endif()
+
+    target_include_directories(dct2 SYSTEM PRIVATE ${FFTW3_INCLUDE_DIRS})
+    target_include_directories(dct2_bench SYSTEM PRIVATE ${FFTW3_INCLUDE_DIRS})
+    target_include_directories(dct2_test SYSTEM PRIVATE ${FFTW3_INCLUDE_DIRS})
+
+    target_link_directories(dct2 PRIVATE ${FFTW3_LIBRARY_DIRS})
+    target_link_directories(dct2_bench PRIVATE ${FFTW3_LIBRARY_DIRS})
+    target_link_directories(dct2_test PRIVATE ${FFTW3_LIBRARY_DIRS})
+
+    target_link_libraries(dct2 PRIVATE ${FFTW3_LIBRARIES})
+    target_link_libraries(dct2_bench PRIVATE ${FFTW3_LIBRARIES})
+    target_link_libraries(dct2_test PRIVATE ${FFTW3_LIBRARIES})
+endif()
+
+if(APPLE)
+    set(VulkanComponents MoltenVK)
+endif()
+# find_package(Vulkan COMPONENTS ${VulkanComponents})
 if(Vulkan_FOUND)
     target_compile_definitions(dct2 PRIVATE HAS_VULKAN)
     target_include_directories(dct2 PRIVATE ${Vulkan_INCLUDE_DIRS})
-    target_link_libraries(dct2 Vulkan::Vulkan)
+    target_link_libraries(dct2 PRIVATE Vulkan::Vulkan)
     if (APPLE)
-        target_link_libraries(dct2 Vulkan::MoltenVK)
+        target_link_libraries(dct2 PRIVATE Vulkan::MoltenVK)
     endif()
-endif()
-
-if(MSVC)
-    target_compile_options(dct2 PRIVATE /W4)
-    target_compile_definitions(dct2 PRIVATE
-        DLL_EXPORT
-        _USE_MATH_DEFINES
-    )
-    target_compile_options(dct2_bench PRIVATE /W4)
-    target_compile_definitions(dct2_bench PRIVATE
-        _USE_MATH_DEFINES
-    )
-    target_compile_options(dct2_test PRIVATE /W4)
-    target_compile_definitions(dct2_test PRIVATE
-        _USE_MATH_DEFINES
-    )
-else()
-    target_compile_options(dct2 PRIVATE -Wall -Wextra -pedantic)
-    target_compile_definitions(dct2 PRIVATE
-        DLL_EXPORT
-    )
-    target_compile_options(dct2_bench PRIVATE -Wall -Wextra -pedantic)
-    target_compile_options(dct2_test PRIVATE -Wall -Wextra -pedantic)
 endif()
 
 if(WIN32)
     target_link_libraries(dct2_bench PRIVATE
         ${LIB_DIR}/libfftw3-3.lib
         ${LIB_DIR}/libfftw3f-3.lib
-    )
-    target_include_directories(dct2_bench PRIVATE "${LIB_DIR}" "${SRC_DIR}")
+        )
 
-    target_include_directories(dct2_test PRIVATE )
+        target_include_directories(dct2_bench SYSTEM PRIVATE "${LIB_DIR}")
+        target_include_directories(dct2_test SYSTEM PRIVATE "${LIB_DIR}")
+
+        target_include_directories(dct2_bench PRIVATE "${SRC_DIR}")
+        target_include_directories(dct2_test PRIVATE "${SRC_DIR}")
+
     target_link_libraries(dct2_test PRIVATE
         ${LIB_DIR}/libfftw3-3.lib
         ${LIB_DIR}/libfftw3f-3.lib
     )
-    target_include_directories(dct2_test PRIVATE "${LIB_DIR}" "${SRC_DIR}")
-else()
-    target_link_libraries(dct2_bench PRIVATE fftw3)
-    target_include_directories(dct2_bench PRIVATE)
-
-    target_include_directories(dct2_test PRIVATE )
-    target_link_libraries(dct2_test PRIVATE fftw3)
 endif()

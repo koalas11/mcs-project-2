@@ -1,4 +1,4 @@
-#ifndef HAS_VULKAN
+#if !(defined HAS_VULKAN || defined HAS_VKFFT || defined HAS_FFTW)
 #include "dct2.h"
 
 // #include <gsl/gsl_integration.h>
@@ -25,17 +25,17 @@ DCT_API dct_context* dct_context_alloc(size_t max_n) {
   return ctx;
 }
 
-void dct_context_free(dct_context* ctx) {
+DCT_API void dct_context_free(dct_context* ctx) {
   if (!ctx) return;
   free(ctx->scratch);
   free(ctx);
 }
 
-int dct_init(dct_context* ctx) {
+DCT_API int dct_init(dct_context* ctx) {
   return 0;
 }
 
-int dct_shutdown(dct_context* ctx) {
+DCT_API int dct_shutdown(dct_context* ctx) {
   return 0;
 }
 
@@ -145,106 +145,23 @@ DCT_API int idct2d(dct_context* ctx,
   return 0;
 }
 
-void _adj_block(size_t width, size_t height,
-  size_t blk_size,
-  size_t* out_bw, size_t* out_bh) {
-  // numero di blocchi in ciascuna direzione
-  size_t nx = (width + blk_size - 1) / blk_size;
-  size_t ny = (height + blk_size - 1) / blk_size;
-  // dimensione effettiva dei blocchi (ceil division)
-  *out_bw = (width + nx - 1) / nx;
-  *out_bh = (height + ny - 1) / ny;
-}
-
-
-DCT_API int dct2dblkrounded(dct_context* ctx,
-  double* mat,
-  size_t width,
-  size_t height,
-  size_t blk_size) {
-  if (!ctx || !mat || blk_size == 0) return -1;
-
-  size_t BW, BH;
-  _adj_block(width, height, blk_size, &BW, &BH);
-
-  if (BW > ctx->max_n || BH > ctx->max_n) return -1;
-
-  // ora dividiamo in blocchi BW×BH
-  for (size_t by = 0; by < height; by += BH) {
-    size_t h = (by + BH <= height ? BH : height - by);
-    for (size_t bx = 0; bx < width; bx += BW) {
-      size_t w = (bx + BW <= width ? BW : width - bx);
-
-      // DCT sulle righe del blocco
-      for (size_t i = 0; i < h; ++i) {
-        double* row = mat + (by + i) * width + bx;
-        if (dct1d(ctx, row, w, 1, row) < 0)
-          return -1;
-      }
-      // DCT sulle colonne del blocco
-      for (size_t j = 0; j < w; ++j) {
-        double* col = mat + by * width + (bx + j);
-        if (dct1d(ctx, col, h, width, col) < 0)
-          return -1;
-      }
-    }
-  }
-  return 0;
-}
-
-// iDCT 2D a blocchi “arrotondati”
-DCT_API int idct2dblkrounded(dct_context* ctx,
-  double* mat,
-  size_t width,
-  size_t height,
-  size_t blk_size) {
-  if (!ctx || !mat || blk_size == 0) return -1;
-
-  size_t BW, BH;
-  _adj_block(width, height, blk_size, &BW, &BH);
-
-  if (BW > ctx->max_n || BH > ctx->max_n) return -1;
-
-  for (size_t by = 0; by < height; by += BH) {
-    size_t h = (by + BH <= height ? BH : height - by);
-    for (size_t bx = 0; bx < width; bx += BW) {
-      size_t w = (bx + BW <= width ? BW : width - bx);
-
-      // iDCT sulle righe del blocco
-      for (size_t i = 0; i < h; ++i) {
-        double* row = mat + (by + i) * width + bx;
-        if (idct1d(ctx, row, w, 1, row) < 0)
-          return -1;
-      }
-      // iDCT sulle colonne del blocco
-      for (size_t j = 0; j < w; ++j) {
-        double* col = mat + by * width + (bx + j);
-        if (idct1d(ctx, col, h, width, col) < 0)
-          return -1;
-      }
-    }
-  }
-  return 0;
-}
-
-
 DCT_API int dct2dblk(dct_context* ctx,
   double* mat,
   size_t width,
   size_t height,
   size_t blk_size) {
   if (!ctx || !mat || blk_size == 0) return -1;
-  
+
   // Verifica che la dimensione del blocco non superi la dimensione massima supportata
   if (blk_size > ctx->max_n) return -1;
-  
+
   // Calcola quanti blocchi completi possiamo fare in ogni dimensione
   size_t num_blocks_x = width / blk_size; // Solo blocchi completi in larghezza
   size_t num_blocks_y = height / blk_size; // Solo blocchi completi in altezza
-  
+
   // Se non possiamo fare almeno un blocco completo, restituisci errore
-  if (num_blocks_x == 0 || num_blocks_y == 0) return -1;
-  
+  if (num_blocks_x == 0 || num_blocks_y == 0) return 0;
+
   // Elabora solo i blocchi completi
   for (size_t by = 0; by < num_blocks_y * blk_size; by += blk_size) {
     for (size_t bx = 0; bx < num_blocks_x * blk_size; bx += blk_size) {
@@ -272,17 +189,17 @@ DCT_API int idct2dblk(dct_context* ctx,
   size_t height,
   size_t blk_size) {
   if (!ctx || !mat || blk_size == 0) return -1;
-  
+
   // Verifica che la dimensione del blocco non superi la dimensione massima supportata
   if (blk_size > ctx->max_n) return -1;
-  
+
   // Calcola quanti blocchi completi possiamo fare in ogni dimensione
   size_t num_blocks_x = width / blk_size; // Solo blocchi completi in larghezza
   size_t num_blocks_y = height / blk_size; // Solo blocchi completi in altezza
-  
+
   // Se non possiamo fare almeno un blocco completo, restituisci errore
-  if (num_blocks_x == 0 || num_blocks_y == 0) return -1;
-  
+  if (num_blocks_x == 0 || num_blocks_y == 0) return 0;
+
   // Elabora solo i blocchi completi
   for (size_t by = 0; by < num_blocks_y * blk_size; by += blk_size) {
     for (size_t bx = 0; bx < num_blocks_x * blk_size; bx += blk_size) {

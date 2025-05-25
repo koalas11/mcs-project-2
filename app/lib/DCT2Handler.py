@@ -109,15 +109,15 @@ class DCT2Handler(QObject):
 
         matrix_ptr = matrix.ctypes.data_as(DoublePtr)
 
-        result = self.lib.dct2dblkrounded(ctx, matrix_ptr, width, height, block_size_t)  # Applica DCT2D
+        result = self.lib.dct2dblk(ctx, matrix_ptr, width, height, block_size_t)  # Applica DCT2D
 
         if result != 0:
             self.sig_img_processing_updates.emit(Progress.ERROR)
             return
 
-        result = self.lib.idct2dblkrounded(ctx, matrix_ptr, width, height, block_size_t)
-
         self.apply_cutoff_to_blocks(matrix, block_size, cut_off_threshold)
+
+        result = self.lib.idct2dblk(ctx, matrix_ptr, width, height, block_size_t)
 
         if result != 0:
             self.sig_img_processing_updates.emit(Progress.ERROR)

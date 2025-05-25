@@ -4,6 +4,7 @@
 #define DCT2_H
 
 #if defined(_MSC_VER)
+#define _USE_MATH_DEFINES
 // Microsoft 
 #if defined(DLL_EXPORT)
 #define DCT_API __declspec(dllexport)
@@ -39,9 +40,6 @@ DCT_API int idct1d(dct_context* ctx, double* coeff, size_t length, size_t stride
 
 DCT_API int dct2d(dct_context* ctx, double* matrix, size_t width, size_t height);
 DCT_API int idct2d(dct_context* ctx, double* matrix, size_t width, size_t height);
-
-DCT_API int dct2dblkrounded(dct_context* ctx, double* matrix, size_t width, size_t height, size_t blk_size);
-DCT_API int idct2dblkrounded(dct_context* ctx, double* matrix, size_t width, size_t height, size_t blk_size);
 
 DCT_API int dct2dblk(dct_context* ctx, double* matrix, size_t width, size_t height, size_t blk_size);
 DCT_API int idct2dblk(dct_context* ctx, double* matrix, size_t width, size_t height, size_t blk_size);

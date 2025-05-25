@@ -42,8 +42,8 @@ class DCT2Library(ctypes.CDLL):
     dct2dblk: Callable[[DCTContextPtr, DoublePtr, SIZE_T, SIZE_T, SIZE_T], INT]
     idct2dblk: Callable[[DCTContextPtr, DoublePtr, SIZE_T, SIZE_T, SIZE_T], INT]
 
-    dct2dblkrounded: Callable[[DCTContextPtr, DoublePtr, SIZE_T, SIZE_T, SIZE_T], INT]
-    idct2dblkrounded: Callable[[DCTContextPtr, DoublePtr, SIZE_T, SIZE_T, SIZE_T], INT]
+    # dct2dblkrounded: Callable[[DCTContextPtr, DoublePtr, SIZE_T, SIZE_T, SIZE_T], INT]
+    # idct2dblkrounded: Callable[[DCTContextPtr, DoublePtr, SIZE_T, SIZE_T, SIZE_T], INT]
 
 
     def __init__(self):

@@ -1,5 +1,6 @@
 .idea
 .venv
+.clangd
 __pycache__
 old/
 build/
