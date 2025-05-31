@@ -202,20 +202,64 @@ DCT_API int dct2dblk(dct_context* ctx,
 
   double* tmp = fftw_alloc_real(width * height);
 
-  int32_t lengths[2] = { width, height };
-  int32_t total_block_length[2] = { num_blocks_x * width, num_blocks_y * height };
-  fftw_r2r_kind kinds[2] = { FFTW_REDFT10, FFTW_REDFT10 };
+  // int32_t lengths[2] = { blk_size, blk_size };
+  // int32_t total_block_length[2] = { num_blocks_x * width, num_blocks_y * height };
+  // fftw_r2r_kind kinds[2] = { FFTW_REDFT10, FFTW_REDFT10 };
+
+  size_t howmany = num_blocks_x * num_blocks_y;
+  double* packed = fftw_alloc_real(howmany * blk_size * blk_size);
+
+  for (size_t by = 0; by < num_blocks_y; ++by) {
+    for (size_t bx = 0; bx < num_blocks_x; ++bx) {
+      size_t block_idx = by * num_blocks_x + bx;
+      double* dst = packed + block_idx * blk_size * blk_size;
+      double* src = mat + by * blk_size * width + bx * blk_size;
+      for (size_t y = 0; y < blk_size; ++y) {
+        memcpy(dst + y * blk_size,
+          src + y * width,
+          blk_size * sizeof(double));
+      }
+    }
+  }
+
 
   fftw_plan plan;
 
-  plan = fftw_plan_many_r2r(2, lengths, num_blocks_x * num_blocks_y, mat, total_block_length, width, blk_size, tmp, total_block_length, width, blk_size, kinds, FFTW_ESTIMATE);
+  int     rank = 2;
+  int32_t n[2] = { (int)blk_size, (int)blk_size };
+  int32_t inembed[2] = { (int)blk_size, (int)blk_size };
+  int32_t onembed[2] = { (int)blk_size, (int)blk_size };
+  int     istride = num_blocks_x, ostride = num_blocks_x;
+  int     idist = blk_size * blk_size;
+  int     odist = blk_size * blk_size;
+  fftw_r2r_kind kinds[2] = { FFTW_REDFT10, FFTW_REDFT10 };
 
+  plan = fftw_plan_many_r2r(
+    rank, n, (int)howmany,
+    mat, inembed, istride, idist,
+    tmp, onembed, ostride, odist,
+    kinds, FFTW_ESTIMATE);
   fftw_execute(plan);
 
-  fftw_destroy_plan(plan);
-  fftw_cleanup();
+  for (size_t by = 0; by < num_blocks_y; ++by) {
+    for (size_t bx = 0; bx < num_blocks_x; ++bx) {
+      size_t idx = by * num_blocks_x + bx;
+      double* src = packed + idx * idist;
+      double* dst = mat + (by * blk_size) * width + bx * blk_size;
+      for (size_t y = 0; y < blk_size; ++y) {
+        memcpy(dst + y * width,
+          src + y * blk_size,
+          blk_size * sizeof(double));
+      }
+    }
+  }
 
   memcpy(mat, tmp, width * height * sizeof(double));
+
+  fftw_destroy_plan(plan);
+  fftw_free(tmp);
+  fftw_free(packed);
+  fftw_cleanup();
 
   normalize_dct2d_ortho(mat, width, height);
 
@@ -241,22 +285,65 @@ DCT_API int idct2dblk(dct_context* ctx,
 
   double* tmp = fftw_alloc_real(width * height);
 
-  int32_t lengths[2] = { width, height };
-  int32_t total_block_length[2] = { num_blocks_x * width, num_blocks_y * height };
-  fftw_r2r_kind kinds[2] = { FFTW_REDFT01, FFTW_REDFT01 };
-
-  fftw_plan plan;
+  // int32_t lengths[2] = { width, height };
+  // int32_t total_block_length[2] = { num_blocks_x * width, num_blocks_y * height };
+  // fftw_r2r_kind kinds[2] = { FFTW_REDFT01, FFTW_REDFT01 };
 
   normalize_idct2d_ortho(mat, width, height);
 
-  plan = fftw_plan_many_r2r(2, lengths, num_blocks_x * num_blocks_y, mat, total_block_length, width, blk_size, tmp, total_block_length, width, blk_size, kinds, FFTW_ESTIMATE);
+  size_t howmany = num_blocks_x * num_blocks_y;
+  double* packed = fftw_alloc_real(howmany * blk_size * blk_size);
 
+  for (size_t by = 0; by < num_blocks_y; ++by) {
+    for (size_t bx = 0; bx < num_blocks_x; ++bx) {
+      size_t block_idx = by * num_blocks_x + bx;
+      double* dst = packed + block_idx * blk_size * blk_size;
+      double* src = mat + by * blk_size * width + bx * blk_size;
+      for (size_t y = 0; y < blk_size; ++y) {
+        memcpy(dst + y * blk_size,
+          src + y * width,
+          blk_size * sizeof(double));
+      }
+    }
+  }
+
+  fftw_plan plan;
+
+  int     rank = 2;
+  int32_t n[2] = { (int)blk_size, (int)blk_size };
+  int32_t inembed[2] = { (int)blk_size, (int)blk_size };
+  int32_t onembed[2] = { (int)blk_size, (int)blk_size };
+  int     istride = num_blocks_x, ostride = num_blocks_x;
+  int     idist = blk_size * blk_size;
+  int     odist = blk_size * blk_size;
+  fftw_r2r_kind kinds[2] = { FFTW_REDFT10, FFTW_REDFT10 };
+
+  plan = fftw_plan_many_r2r(
+    rank, n, (int)howmany,
+    mat, inembed, istride, idist,
+    tmp, onembed, ostride, odist,
+    kinds, FFTW_ESTIMATE);
   fftw_execute(plan);
 
-  fftw_destroy_plan(plan);
-  fftw_cleanup();
+  for (size_t by = 0; by < num_blocks_y; ++by) {
+    for (size_t bx = 0; bx < num_blocks_x; ++bx) {
+      size_t idx = by * num_blocks_x + bx;
+      double* src = packed + idx * idist;
+      double* dst = mat + (by * blk_size) * width + bx * blk_size;
+      for (size_t y = 0; y < blk_size; ++y) {
+        memcpy(dst + y * width,
+          src + y * blk_size,
+          blk_size * sizeof(double));
+      }
+    }
+  }
 
   memcpy(mat, tmp, width * height * sizeof(double));
+
+  fftw_destroy_plan(plan);
+  fftw_free(tmp);
+  fftw_free(packed);
+  fftw_cleanup();
 
   normalize_fftw_2d(mat, width, height);
 

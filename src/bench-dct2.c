@@ -5,39 +5,45 @@
 #include "fftw-dct2.h"
 
 #define MIN_N 2
-#define MAX_N 4096
+#define MAX_N 2048
 #define REPEAT 5
 
 // Alloca una matrice contigua e restituisce il puntatore al blocco
-double *alloc_matrix_contiguous(int n) {
-    return (double *) malloc(n * n * sizeof(double));
+double* alloc_matrix_contiguous(int n) {
+    return (double*)malloc(n * n * sizeof(double));
 }
 
 // Riempie una matrice contigua con valori random
-void fill_random_contiguous(double *mat, int n) {
+void fill_random_contiguous(double* mat, int n) {
     for (int i = 0; i < n * n; i++)
         mat[i] = (double)rand() / RAND_MAX;
 }
 
 int main(void) {
-    FILE *csv = fopen("bench.csv", "w");
+    FILE* csv;
+    csv = fopen("bench.csv", "wx");
     if (!csv) {
-        perror("Cannot open CSV file");
-        return 1;
+        perror("File probably already exists");
+        csv = fopen("bench.csv", "a");
+        if (!csv) {
+            perror("Cannot open CSV file");
+            return 1;
+        }
+    } else {
+        fprintf(csv, "n,dct2d_s,idct2d_s,fftw_dct2d_s,fftw_idct2d_s\n");
     }
-    fprintf(csv, "n,dct2d_ms,idct2d_ms,fftw_dct2d_ms,fftw_idct2d_ms\n");
 
     srand((unsigned int)time(NULL));
 
     for (int n = MIN_N; n <= MAX_N; n = n * 2) {
         printf("Eseguendo benchmark per n = %d...\n", n);
         // Matrici contigue per la nostra DCT2
-        double *in_c = alloc_matrix_contiguous(n);
-        double *out_c = alloc_matrix_contiguous(n);
+        double* in_c = alloc_matrix_contiguous(n);
+        double* out_c = alloc_matrix_contiguous(n);
 
         double total_dct2d = 0, total_idct2d = 0, total_fftw_dct2d = 0, total_fftw_idct2d = 0;
 
-        dct_context *ctx = dct_context_alloc(n);
+        dct_context* ctx = dct_context_alloc(n);
 
         for (int rep = 0; rep < REPEAT; rep++) {
             fill_random_contiguous(in_c, n);
@@ -69,6 +75,7 @@ int main(void) {
         dct_context_free(ctx);
 
         fprintf(csv, "%d,%.3f,%.3f,%.3f,%.3f\n", n, total_dct2d / REPEAT, total_idct2d / REPEAT, total_fftw_dct2d / REPEAT, total_fftw_idct2d / REPEAT);
+        fflush(csv);
 
         free(in_c);
         free(out_c);

@@ -6,3 +6,4 @@ old/
 build/
 target/
 lib/
+tmp/
