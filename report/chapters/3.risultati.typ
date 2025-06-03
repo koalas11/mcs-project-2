@@ -217,3 +217,23 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
     image("../images/shoe_20_1.png"),
   ),
 )
+
+#figure(
+  caption: [Sinistra: immagine non compressa. Destra: immagine compressa con $F = 50$ e $d = 10$],
+  grid(
+    columns: (1fr,) * 2,
+    column-gutter: 0.75em,
+    image("../images/bird.png"),
+    image("../images/bird_50_10.png"),
+  ),
+)
+
+#figure(
+  caption: [Sinistra: immagine non compressa. Destra: immagine compressa con $F = 50$ e $d = 20$],
+  grid(
+    columns: (1fr,) * 2,
+    column-gutter: 0.75em,
+    image("../images/bird.png"),
+    image("../images/bird_50_20.png"),
+  ),
+)
