@@ -14,6 +14,7 @@ class ImagesHandler(QObject):
 
     sig_update_original_img = Signal(np.ndarray)
     sig_update_processed_img = Signal(np.ndarray)
+    sig_original_img_loaded = Signal(int, int)
     sig_error = Signal(str)
     sig_progress = Signal(Progress)
 
@@ -31,6 +32,7 @@ class ImagesHandler(QObject):
 
             self.tmp_img_arr = None
             self.sig_update_original_img.emit(ImagesHandler.original_img_arr)
+            self.sig_original_img_loaded.emit(image.shape[1], image.shape[0])
         else:
             self.sig_error.emit("Invalid image data provided.")
             self.sig_progress.emit(Progress.ERROR)

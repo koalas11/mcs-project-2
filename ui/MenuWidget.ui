@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>401</width>
-    <height>300</height>
+    <height>324</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -49,12 +49,22 @@
     </widget>
    </item>
    <item>
+    <widget class="QLabel" name="BlockSizeLabel">
+     <property name="text">
+      <string>Block Size</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="GridLayout">
      <property name="topMargin">
       <number>0</number>
      </property>
      <item>
       <widget class="QSpinBox" name="GridSizeSpinBox">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="minimum">
         <number>1</number>
        </property>
@@ -70,6 +80,33 @@
       <widget class="QPushButton" name="ToggleGridButton">
        <property name="text">
         <string>Disable Grid</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="NumBlocksLayout">
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="NumBlocksLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Num Blocks:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="NumBlocksValue">
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </item>
@@ -139,12 +176,22 @@
      </item>
      <item>
       <widget class="QSpinBox" name="CutOffThresholdSpinBox">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="maximum">
         <number>100</number>
        </property>
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="ScipyImplCheckBox">
+     <property name="text">
+      <string>Use Scipy Implementation</string>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="Line" name="line_2">

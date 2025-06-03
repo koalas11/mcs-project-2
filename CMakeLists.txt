@@ -78,8 +78,11 @@ set_target_properties(dct2_test PROPERTIES
 )
 target_include_directories(dct2_test PRIVATE ${SRC_DIR})
 
+if(WIN32 AND $ENV{LOCAL_LIB})
+    set(fftw3_DIR "${CMAKE_SOURCE_DIR}/lib")
+endif()
 
-find_package(fftw3)
+find_package(fftw3 REQUIRED)
 if(fftw3_FOUND)
 	message("fftw3 found:")
 	message("   -- lib: " ${FFTW3_LIBRARIES})
@@ -114,22 +117,4 @@ if(Vulkan_FOUND)
 	if (APPLE)
 		target_link_libraries(dct2 PRIVATE Vulkan::MoltenVK)
 	endif()
-endif()
-
-if(WIN32)
-	target_link_libraries(dct2_bench PRIVATE
-								${LIB_DIR}/libfftw3-3.lib
-								${LIB_DIR}/libfftw3f-3.lib
-								)
-
-	target_include_directories(dct2_bench SYSTEM PRIVATE "${LIB_DIR}")
-	target_include_directories(dct2_test SYSTEM PRIVATE "${LIB_DIR}")
-
-	target_include_directories(dct2_bench PRIVATE "${SRC_DIR}")
-	target_include_directories(dct2_test PRIVATE "${SRC_DIR}")
-
-	target_link_libraries(dct2_test PRIVATE
-								${LIB_DIR}/libfftw3-3.lib
-								${LIB_DIR}/libfftw3f-3.lib
-				)
 endif()

@@ -6,6 +6,7 @@ import numpy as np
 from PySide6.QtCore import QObject, QThread, Slot, Signal
 from scipy.fftpack import dctn, idctn
 
+from app.Settings import Settings
 from .DCT2Library import DCT2Library, DoublePtr
 
 
@@ -13,6 +14,21 @@ class Progress(IntEnum):
     STARTED = 0
     FINISHED = 1
     ERROR = -1
+
+
+def apply_cutoff_to_blocks(
+        matrix: np.ndarray,
+    block_size: int,
+    cut_off_threshold: int,
+):
+    for r in range(matrix.shape[0] // block_size):
+        for c in range(matrix.shape[1] // block_size):
+            block = matrix[r * block_size:(r + 1) * block_size, c * block_size:(c + 1) * block_size]
+
+            for k in range(block_size):
+                for l in range(block_size):
+                    if k + l >= cut_off_threshold:
+                        block[k, l] = 0
 
 
 class DCT2Handler(QObject):
@@ -65,22 +81,6 @@ class DCT2Handler(QObject):
         self.sig_img_processed.emit(matrix_new)
         self.sig_img_processing_updates.emit(Progress.FINISHED)
 
-        return
-
-        for r in range(matrix.shape[0] // block_size):
-            for c in range(matrix.shape[1] // block_size):
-                block = dctn(matrix[r*block_size : (r+1)*block_size, c*block_size : (c+1)*block_size], norm='ortho')
-
-                for k in range(block_size):
-                    for l in range(block_size):
-                        if k + l >= cut_off_threshold:
-                            block[k,l] = 0
-
-                matrix[r*block_size : (r+1)*block_size, c*block_size : (c+1)*block_size] = idctn(block, norm='ortho')
-
-        matrix_new = matrix.clip(0, 255).round().astype(np.uint8)
-        self.sig_img_processed.emit(matrix_new)
-        self.sig_img_processing_updates.emit(Progress.FINISHED)
 
     def dct2d(
         self,
@@ -107,38 +107,34 @@ class DCT2Handler(QObject):
 
         matrix_ptr = matrix.ctypes.data_as(DoublePtr)
 
-        result = self.lib.dct2dblk(ctx, matrix_ptr, width, height, block_size_t)  # Applica DCT2D
+        if Settings.use_scipy:
+            for r in range(matrix.shape[0] // block_size):
+                for c in range(matrix.shape[1] // block_size):
+                    block: np.typing.NDArray = dctn(matrix[r * block_size: (r + 1) * block_size, c * block_size: (c + 1) * block_size], norm='ortho')
 
-        if result != 0:
-            self.sig_img_processing_updates.emit(Progress.ERROR)
-            return
+                    for k in range(block_size):
+                        for l in range(block_size):
+                            if k + l >= cut_off_threshold:
+                                block[k, l] = 0
 
-        self.apply_cutoff_to_blocks(matrix, block_size, cut_off_threshold)
+                    matrix[r * block_size: (r + 1) * block_size, c * block_size: (c + 1) * block_size] = idctn(block, norm='ortho')
+        else:
+            result = self.lib.dct2dblk(ctx, matrix_ptr, width, height, block_size_t)  # Applica DCT2D
 
-        result = self.lib.idct2dblk(ctx, matrix_ptr, width, height, block_size_t)
+            if result != 0:
+                self.sig_img_processing_updates.emit(Progress.ERROR)
+                return
 
-        if result != 0:
-            self.sig_img_processing_updates.emit(Progress.ERROR)
-            return
+            apply_cutoff_to_blocks(matrix, block_size, cut_off_threshold)
+
+            result = self.lib.idct2dblk(ctx, matrix_ptr, width, height, block_size_t)
+
+            if result != 0:
+                self.sig_img_processing_updates.emit(Progress.ERROR)
+                return
 
         self.lib.dct_shutdown(ctx)
         self.lib.dct_context_free(ctx)
-
-    def apply_cutoff_to_blocks(
-        self,
-        matrix: np.ndarray,
-        block_size: int,
-        cut_off_threshold: int,
-    ):
-        for r in range(matrix.shape[0] // block_size):
-            for c in range(matrix.shape[1] // block_size):
-                block = matrix[r * block_size:(r + 1) * block_size, c * block_size:(c + 1) * block_size]
-
-                for k in range(block_size):
-                    for l in range(block_size):
-                        if k + l >= cut_off_threshold:
-                            block[k, l] = 0
-
 
     def close(self):
         if self.lib is not None:

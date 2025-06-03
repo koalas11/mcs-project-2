@@ -8,16 +8,22 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication)
-from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel,
-                               QLineEdit, QPushButton, QSizePolicy, QSpacerItem,
-                               QSpinBox, QVBoxLayout)
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QFrame, QHBoxLayout,
+    QLabel, QLineEdit, QPushButton, QSizePolicy,
+    QSpacerItem, QSpinBox, QVBoxLayout, QWidget)
 
 class Ui_MenuWidget(object):
     def setupUi(self, MenuWidget):
         if not MenuWidget.objectName():
             MenuWidget.setObjectName(u"MenuWidget")
-        MenuWidget.resize(401, 300)
+        MenuWidget.resize(401, 324)
         self.verticalLayout = QVBoxLayout(MenuWidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.ImageFileLabel = QLabel(MenuWidget)
@@ -52,11 +58,17 @@ class Ui_MenuWidget(object):
 
         self.verticalLayout.addWidget(self.line)
 
+        self.BlockSizeLabel = QLabel(MenuWidget)
+        self.BlockSizeLabel.setObjectName(u"BlockSizeLabel")
+
+        self.verticalLayout.addWidget(self.BlockSizeLabel)
+
         self.GridLayout = QHBoxLayout()
         self.GridLayout.setObjectName(u"GridLayout")
         self.GridLayout.setContentsMargins(-1, 0, -1, -1)
         self.GridSizeSpinBox = QSpinBox(MenuWidget)
         self.GridSizeSpinBox.setObjectName(u"GridSizeSpinBox")
+        self.GridSizeSpinBox.setEnabled(False)
         self.GridSizeSpinBox.setMinimum(1)
         self.GridSizeSpinBox.setMaximum(100)
         self.GridSizeSpinBox.setValue(2)
@@ -71,14 +83,32 @@ class Ui_MenuWidget(object):
 
         self.verticalLayout.addLayout(self.GridLayout)
 
+        self.NumBlocksLayout = QHBoxLayout()
+        self.NumBlocksLayout.setObjectName(u"NumBlocksLayout")
+        self.NumBlocksLayout.setContentsMargins(-1, 0, -1, -1)
+        self.NumBlocksLabel = QLabel(MenuWidget)
+        self.NumBlocksLabel.setObjectName(u"NumBlocksLabel")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.NumBlocksLabel.sizePolicy().hasHeightForWidth())
+        self.NumBlocksLabel.setSizePolicy(sizePolicy1)
+
+        self.NumBlocksLayout.addWidget(self.NumBlocksLabel)
+
+        self.NumBlocksValue = QLabel(MenuWidget)
+        self.NumBlocksValue.setObjectName(u"NumBlocksValue")
+
+        self.NumBlocksLayout.addWidget(self.NumBlocksValue)
+
+
+        self.verticalLayout.addLayout(self.NumBlocksLayout)
+
         self.GridColorLayout = QHBoxLayout()
         self.GridColorLayout.setObjectName(u"GridColorLayout")
         self.GridColorLayout.setContentsMargins(-1, 0, -1, -1)
         self.GridColorLabel = QLabel(MenuWidget)
         self.GridColorLabel.setObjectName(u"GridColorLabel")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.GridColorLabel.sizePolicy().hasHeightForWidth())
         self.GridColorLabel.setSizePolicy(sizePolicy1)
 
@@ -114,12 +144,18 @@ class Ui_MenuWidget(object):
 
         self.CutOffThresholdSpinBox = QSpinBox(MenuWidget)
         self.CutOffThresholdSpinBox.setObjectName(u"CutOffThresholdSpinBox")
+        self.CutOffThresholdSpinBox.setEnabled(False)
         self.CutOffThresholdSpinBox.setMaximum(100)
 
         self.CutOffThresholdLayout.addWidget(self.CutOffThresholdSpinBox)
 
 
         self.verticalLayout.addLayout(self.CutOffThresholdLayout)
+
+        self.ScipyImplCheckBox = QCheckBox(MenuWidget)
+        self.ScipyImplCheckBox.setObjectName(u"ScipyImplCheckBox")
+
+        self.verticalLayout.addWidget(self.ScipyImplCheckBox)
 
         self.line_2 = QFrame(MenuWidget)
         self.line_2.setObjectName(u"line_2")
@@ -150,9 +186,13 @@ class Ui_MenuWidget(object):
         MenuWidget.setWindowTitle(QCoreApplication.translate("MenuWidget", u"Form", None))
         self.ImageFileLabel.setText(QCoreApplication.translate("MenuWidget", u"Image File:", None))
         self.ImageBrowseButton.setText(QCoreApplication.translate("MenuWidget", u"Browse", None))
+        self.BlockSizeLabel.setText(QCoreApplication.translate("MenuWidget", u"Block Size", None))
         self.ToggleGridButton.setText(QCoreApplication.translate("MenuWidget", u"Disable Grid", None))
+        self.NumBlocksLabel.setText(QCoreApplication.translate("MenuWidget", u"Num Blocks:", None))
+        self.NumBlocksValue.setText("")
         self.GridColorLabel.setText(QCoreApplication.translate("MenuWidget", u"Current Grid Color:", None))
         self.CutOffThresholdLabel.setText(QCoreApplication.translate("MenuWidget", u"Cut Off Threshold", None))
+        self.ScipyImplCheckBox.setText(QCoreApplication.translate("MenuWidget", u"Use Scipy Implementation", None))
         self.ApplyButton.setText(QCoreApplication.translate("MenuWidget", u"Apply", None))
         self.SaveProcessedImageButton.setText(QCoreApplication.translate("MenuWidget", u"Save Processed Image", None))
     # retranslateUi

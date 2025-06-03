@@ -7,3 +7,4 @@ build/
 target/
 lib/
 tmp/
+!app/lib

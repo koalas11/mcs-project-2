@@ -16,13 +16,13 @@ $
   x(n) = frac(1, 2)X(0) + sum_(k=1)^(N-1) X(k) cos[frac(pi, N) k (n + frac(1, 2))], space.quad n = 0, 1, dots, N-1
 $ <idct>
 
-Una proprietà fondamentale della DCT è la sua ortogonalità: le funzioni base della trasformata sono ortogonali tra loro, il che implica che l’energia del segnale viene preservata durante la trasformazione. Questa proprietà garantisce che non vi sia perdita di informazioni nel processo di trasformazione e inversione.
+Una proprietà fondamentale della DCT è la sua ortogonalità: le funzioni base della trasformata sono ortogonali tra loro, il che implica che l'energia del segnale viene preservata durante la trasformazione. Questa proprietà garantisce che non vi sia perdita di informazioni nel processo di trasformazione e inversione.
 
 == Algorimo DCT
 
 // Algoritmo naive DCT, con focus sulla DCT-II e DCT-III.
 
-L’implementazione ingenua della DCT richiede il calcolo diretto delle formule matematiche presentate. Per la DCT-II, l’algoritmo base prevede:
+L'implementazione ingenua della DCT richiede il calcolo diretto delle formule matematiche presentate. Per la DCT-II, l'algoritmo base prevede:
 
 1. Per ogni indice di output $k$ da $0$ a $N-1$:
   - Calcolare la somma dei prodotti tra ogni elemento di input $x(n)$ e il corrispondente valore di coseno.
@@ -36,7 +36,7 @@ Sebbene concettualmente semplice, questo approccio diventa rapidamente inefficie
 
 // Introduzione sul perche è importante ottimizzare la DCT.
 
-L’ottimizzazione della DCT è fondamentale per le applicazioni pratiche, poiché la trasformata viene generalmente applicata a grandi quantità di dati, come immagini e video. Le implementazioni naive, con complessità $O(N^3)$ per trasformate bidimensionali, risultano proibitive per applicazioni in tempo reale o per dispositivi con risorse limitate.
+L'ottimizzazione della DCT è fondamentale per le applicazioni pratiche, poiché la trasformata viene generalmente applicata a grandi quantità di dati, come immagini e video. Le implementazioni naive, con complessità $O(N^3)$ per trasformate bidimensionali, risultano proibitive per applicazioni in tempo reale o per dispositivi con risorse limitate.
 
 La riduzione della complessità computazionale comporta molteplici vantaggi:
 
@@ -50,15 +50,15 @@ La riduzione della complessità computazionale comporta molteplici vantaggi:
 // Introduzione alla FFT, come viene usata per calcolare la DCT in $O(n log_2 n)$.
 // Menzione di FFTW come libreria di riferimento per la FFT.
 
-La Fast Fourier Transform (FFT) rappresenta una svolta nell’ottimizzazione della Discrete Cosine Transform (DCT). Poiché la DCT può essere espressa in termini di FFT con opportune modifiche, la complessità computazionale si riduce da $O(N^2)$ a $O(N log_2 N)$ per trasformate unidimensionali.
+La Fast Fourier Transform (FFT) rappresenta una svolta nell'ottimizzazione della Discrete Cosine Transform (DCT). Poiché la DCT può essere espressa in termini di FFT con opportune modifiche, la complessità computazionale si riduce da $O(N^2)$ a $O(N log_2 N)$ per trasformate unidimensionali.
 
-L’algoritmo principale sfrutta la scomposizione della DCT in termini di FFT attraverso diverse tecniche, tra cui:
+L'algoritmo principale sfrutta la scomposizione della DCT in termini di FFT attraverso diverse tecniche, tra cui:
 
 - Rappresentazione della DCT come FFT di una sequenza opportunamente riordinata;
 - Utilizzo di simmetrie e periodicità per ridurre il numero di calcoli necessari;
 - Applicazione di algoritmi divide-and-conquer per scomporre il problema in sottoproblemi più piccoli.
 
-FFTW (Fastest Fourier Transform in the West) rappresenta una delle librerie di riferimento più utilizzate per il calcolo efficiente della FFT. Questa libreria implementa automaticamente diversi algoritmi ottimizzati, selezionando il più efficiente in base alle dimensioni dell’input e all’architettura hardware disponibile.
+FFTW (Fastest Fourier Transform in the West) rappresenta una delle librerie di riferimento più utilizzate per il calcolo efficiente della FFT. Questa libreria implementa automaticamente diversi algoritmi ottimizzati, selezionando il più efficiente in base alle dimensioni dell'input e all'architettura hardware disponibile.
 
 === Parallelizzazione
 
@@ -66,7 +66,7 @@ FFTW (Fastest Fourier Transform in the West) rappresenta una delle librerie di r
 
 La parallelizzazione rappresenta una strategia fondamentale per ottimizzare il calcolo della DCT. Data la natura intrinsecamente parallela di molte operazioni coinvolte nella trasformata, è possibile distribuire il carico computazionale su più unità di elaborazione.
 
-L’implementazione su GPGPU (General Purpose Graphics Processing Unit) offre vantaggi significativi:
+L'implementazione su GPGPU (General Purpose Graphics Processing Unit) offre vantaggi significativi:
 
 - Architettura altamente parallela con migliaia di core di elaborazione;
 - Elevata larghezza di banda di memoria, cruciale per operazioni su matrici;
@@ -75,22 +75,22 @@ L’implementazione su GPGPU (General Purpose Graphics Processing Unit) offre va
 
 In alternativa, su sistemi multicore, il multi-threading consente di:
 
-- Suddividere l’immagine in blocchi indipendenti elaborati da thread separati;
+- Suddividere l'immagine in blocchi indipendenti elaborati da thread separati;
 - Sfruttare tutti i core disponibili su CPU moderne;
-- Implementare strategie di bilanciamento del carico per massimizzare l’efficienza;
+- Implementare strategie di bilanciamento del carico per massimizzare l'efficienza;
 - Utilizzare librerie ottimizzate come OpenMP per semplificare la parallelizzazione.
 
 == DCT a blocchi
 
 // Introduzione alla DCT a blocchi, come viene usata nella compressione di immagini.
 
-Nella compressione di immagini, la Discrete Cosine Transform (DCT) viene tipicamente applicata non all’intera immagine, bensì a blocchi di dimensioni ridotte. Questo approccio a blocchi presenta numerosi vantaggi sia pratici che teorici.
+Nella compressione di immagini, la Discrete Cosine Transform (DCT) viene tipicamente applicata non all'intera immagine, bensì a blocchi di dimensioni ridotte. Questo approccio a blocchi presenta numerosi vantaggi sia pratici che teorici.
 
-Lo standard JPEG, ad esempio, suddivide l’immagine in blocchi di $8 times 8$ pixel, applicando la DCT-2D separatamente a ciascun blocco. Questa strategia offre diversi benefici:
+Lo standard JPEG, ad esempio, suddivide l'immagine in blocchi di $8 times 8$ pixel, applicando la DCT-2D separatamente a ciascun blocco. Questa strategia offre diversi benefici:
 
-- Riduzione della complessità computazionale, limitando le dimensioni dell’input per ogni trasformata.
-- Migliore localizzazione delle caratteristiche dell’immagine, consentendo una compressione adattiva.
+- Riduzione della complessità computazionale, limitando le dimensioni dell'input per ogni trasformata.
+- Migliore localizzazione delle caratteristiche dell'immagine, consentendo una compressione adattiva.
 - Possibilità di elaborazione parallela naturale, dato che i blocchi sono indipendenti.
 - Minori requisiti di memoria, poiché solo un blocco alla volta deve essere mantenuto in memoria di lavoro.
 
-Tuttavia, l’applicazione della DCT a blocchi può introdurre artefatti visibili ai bordi dei blocchi, specialmente ad alti rapporti di compressione. Questo fenomeno, noto come “blocking effect”, rappresenta una delle limitazioni principali di questo approccio e ha portato allo sviluppo di tecniche di post-elaborazione specifiche per mitigare tali artefatti.
+Tuttavia, l'applicazione della DCT a blocchi può introdurre artefatti visibili ai bordi dei blocchi, specialmente ad alti rapporti di compressione. Questo fenomeno, noto come “blocking effect”, rappresenta una delle limitazioni principali di questo approccio e ha portato allo sviluppo di tecniche di post-elaborazione specifiche per mitigare tali artefatti.

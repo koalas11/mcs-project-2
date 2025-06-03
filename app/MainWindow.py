@@ -46,6 +46,7 @@ class MainWindow(QMainWindow):
         self.images_handler.sig_error.connect(self.showError)
         self.images_handler.sig_progress.connect(self.images_widget.on_progress_update)
         self.images_handler.sig_progress.connect(self.menu_widget.on_progress_update)
+        self.images_handler.sig_original_img_loaded.connect(self.menu_widget.on_image_loaded)
 
         self.menu_widget.sig_grid_changed.connect(self.images_widget.on_grid_changed)
         self.menu_widget.sig_apply_button_clicked.connect(self.images_handler.start_processing)

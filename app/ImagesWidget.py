@@ -28,29 +28,30 @@ def update_display(pixmap: QPixmap, item: QGraphicsPixmapItem, no_grid = False):
     # Draw grid if enabled
     if Settings.grid_enabled and not no_grid:
         color = Settings.grid_color
-        color.setAlpha(240)
+        color.setAlphaF(0.75)
 
         pen = QPen(color)
 
         # Calcola la dimensione dei blocchi
-        block_width = display_pixmap.width() // Settings.block_size
-        block_height = display_pixmap.height() // Settings.block_size
-        x_size = block_width * Settings.block_size
-        y_size = block_height * Settings.block_size
+        blocks_x = display_pixmap.width() // Settings.block_size
+        blocks_y = display_pixmap.height() // Settings.block_size
+
+        size_x = Settings.block_size * blocks_x
+        size_y = Settings.block_size * blocks_y
 
         pen.setWidth(display_pixmap.width() // 200)
         painter.setPen(pen)
         # Disegna linee orizzontali per blocchi completi
-        for i in range(Settings.block_size + 1):
-            y = i * block_height
-            painter.drawLine(0, y, x_size, y)
+        for i in range(blocks_y + 1):
+            y = i * Settings.block_size
+            painter.drawLine(0, y, size_x, y)
 
         pen.setWidth(display_pixmap.height() // 200)
         painter.setPen(pen)
         # Disegna linee verticali per blocchi completi
-        for i in range(Settings.block_size + 1):
-            x = i * block_width
-            painter.drawLine(x, 0, x, y_size)
+        for i in range(blocks_x + 1):
+            x = i * Settings.block_size
+            painter.drawLine(x, 0, x, size_y)
 
     painter.end()
 

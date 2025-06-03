@@ -14,6 +14,9 @@ class MenuWidget(QWidget):
     sig_grid_changed = Signal()
     sig_apply_button_clicked = Signal()
 
+    img_size_x: int = 0
+    img_size_y: int = 0
+
     def __init__(self, parent=None):
         super(MenuWidget, self).__init__(parent)
         self.ui = Ui_MenuWidget()
@@ -30,7 +33,19 @@ class MenuWidget(QWidget):
         self.ui.CutOffThresholdSpinBox.valueChanged.connect(self.on_cut_off_threshold_changed)
         self.ui.ApplyButton.clicked.connect(self.on_apply_button_clicked)
         self.ui.SaveProcessedImageButton.clicked.connect(self.save_processed_image)
+        self.ui.ScipyImplCheckBox.checkStateChanged.connect(self.on_scipy_impl_changed)
 
+    @Slot(int, int)
+    def on_image_loaded(self, size_x: int, size_y: int):
+        """Update the UI when an image is loaded."""
+        self.ui.GridSizeSpinBox.setEnabled(True)
+        self.ui.CutOffThresholdSpinBox.setEnabled(True)
+        size = min(size_x, size_y)
+        self.img_size_x = size_x
+        self.img_size_y = size_y
+        self.ui.GridSizeSpinBox.setRange(2, size)
+        self.ui.GridSizeSpinBox.setValue(int(size * 0.1))
+        self.ui.ApplyButton.setEnabled(True)
 
     @Slot()
     def on_browse_file_button_clicked(self):
@@ -59,6 +74,8 @@ class MenuWidget(QWidget):
     @Slot(int)
     def on_grid_size_changed(self, size: int):
         Settings.block_size = size
+        self.ui.NumBlocksValue.setText(str((self.img_size_x // size) * (self.img_size_y // size)))
+        self.ui.CutOffThresholdSpinBox.setRange(0, size * 2 - 2)
         self.sig_grid_changed.emit()
 
     @Slot()
@@ -98,13 +115,17 @@ class MenuWidget(QWidget):
             try:
                 img = Image.fromarray(ImagesHandler.processed_img)
                 path = QStandardPaths.standardLocations(QStandardPaths.StandardLocation.HomeLocation.DesktopLocation)
-                fileName, _ = QFileDialog.getSaveFileName(self, "Save Image", path[0], "Images (*.bmp)")
+                fileName, _ = QFileDialog.getSaveFileName(self, "Save Image", path[0], "PNG Images (*.png);;BMP Images (*.bmp)")
                 
                 if fileName is None or fileName == "":
                     return
                 
                 img.save(fileName)
             except Exception as e:
-                QMessageBox.critical(None, "Error", f"Failed to save image: {str(e)}")
+                QMessageBox.critical(self, "Error", f"Failed to save image: {str(e)}")
         else:
-            QMessageBox.warning(None, "Warning", "No processed image to save.")
+            QMessageBox.warning(self, "Warning", "No processed image to save.")
+
+    @Slot(Qt.CheckState)
+    def on_scipy_impl_changed(self, state: Qt.CheckState):
+        Settings.use_scipy = state == Qt.CheckState.Checked
