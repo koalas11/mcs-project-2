@@ -1,6 +1,4 @@
-from typing import Optional
-
-from PySide6.QtCore import QThread, Qt
+from PySide6.QtCore import QThread, Slot
 from PySide6.QtWidgets import QMainWindow, QMessageBox
 
 from .BackgroundWorker import BackgroundWorker
@@ -37,11 +35,17 @@ class MainWindow(QMainWindow):
         self.background_worker.background_worker_thread.setObjectName("BackgroundWorkerThread")
         self.background_worker.background_worker_thread.start()
 
-        self.menu_widget.sig_image_selected.connect(self.background_worker.convert_img_to_array, Qt.ConnectionType.QueuedConnection)
+        self.menu_widget.sig_image_selected.connect(self.background_worker.convert_img_to_array)
         self.background_worker.sig_img_converted.connect(self.images_handler.load_image)
+        self.background_worker.sig_error.connect(self.showError)
+        self.background_worker.sig_progress.connect(self.images_widget.on_progress_update)
+        self.background_worker.sig_progress.connect(self.menu_widget.on_progress_update)
 
         self.images_handler.sig_update_original_img.connect(self.images_widget.load_image)
         self.images_handler.sig_update_processed_img.connect(self.images_widget.load_processed_image)
+        self.images_handler.sig_error.connect(self.showError)
+        self.images_handler.sig_progress.connect(self.images_widget.on_progress_update)
+        self.images_handler.sig_progress.connect(self.menu_widget.on_progress_update)
 
         self.menu_widget.sig_grid_changed.connect(self.images_widget.on_grid_changed)
         self.menu_widget.sig_apply_button_clicked.connect(self.images_handler.start_processing)
@@ -68,6 +72,11 @@ class MainWindow(QMainWindow):
                 "Error",
                 "Could not load the DCT2 library.\n" + self.dct2_handler.lib_load_error,
             )
+
+    @Slot()
+    def showError(self, message: str):
+        """Display an error message in a message box."""
+        QMessageBox.critical(self, "Error", message)
 
     def closeEvent(self, event):
         self.dct2_handler.close()

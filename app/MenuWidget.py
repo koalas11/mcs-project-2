@@ -1,18 +1,14 @@
+from PIL import Image
 from PySide6.QtCore import Qt, Slot, QStandardPaths, Signal
-from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QWidget, QMessageBox, QFileDialog, QColorDialog
 
+from .ImagesHandler import ImagesHandler
+from .Settings import Settings
 from .lib.DCT2Handler import Progress
 from .ui_generated.ui_MenuWidget import Ui_MenuWidget
 
 
 class MenuWidget(QWidget):
-    block_size: int = 1
-    cut_off_threshold: int = 0
-
-    grid_color: QColor = QColor.fromRgb(255, 0, 0)
-    grid_enabled: bool = True
-
 
     sig_image_selected = Signal(str)
     sig_grid_changed = Signal()
@@ -23,9 +19,9 @@ class MenuWidget(QWidget):
         self.ui = Ui_MenuWidget()
         self.ui.setupUi(self)
 
-        self.ui.GridSizeSpinBox.setValue(MenuWidget.block_size)
-        self.ui.GridColorValue.setStyleSheet(f"background-color: {MenuWidget.grid_color.name()};")
-        self.ui.CutOffThresholdSpinBox.setValue(MenuWidget.cut_off_threshold)
+        self.ui.GridSizeSpinBox.setValue(Settings.block_size)
+        self.ui.GridColorValue.setStyleSheet(f"background-color: {Settings.grid_color.name()};")
+        self.ui.CutOffThresholdSpinBox.setValue(Settings.cut_off_threshold)
 
         self.ui.ImageBrowseButton.clicked.connect(self.on_browse_file_button_clicked)
         self.ui.ToggleGridButton.clicked.connect(self.on_grid_toggle)
@@ -33,6 +29,8 @@ class MenuWidget(QWidget):
         self.ui.GridColorValue.clicked.connect(self.on_grid_color_button_clicked)
         self.ui.CutOffThresholdSpinBox.valueChanged.connect(self.on_cut_off_threshold_changed)
         self.ui.ApplyButton.clicked.connect(self.on_apply_button_clicked)
+        self.ui.SaveProcessedImageButton.clicked.connect(self.save_processed_image)
+
 
     @Slot()
     def on_browse_file_button_clicked(self):
@@ -51,8 +49,8 @@ class MenuWidget(QWidget):
 
     @Slot()
     def on_grid_toggle(self):
-        MenuWidget.grid_enabled = not MenuWidget.grid_enabled
-        if MenuWidget.grid_enabled:
+        Settings.grid_enabled = not Settings.grid_enabled
+        if Settings.grid_enabled:
             self.ui.ToggleGridButton.setText("Disable Grid")
         else:
             self.ui.ToggleGridButton.setText("Enable Grid")
@@ -60,20 +58,20 @@ class MenuWidget(QWidget):
 
     @Slot(int)
     def on_grid_size_changed(self, size: int):
-        MenuWidget.block_size = size
+        Settings.block_size = size
         self.sig_grid_changed.emit()
 
     @Slot()
     def on_grid_color_button_clicked(self):
         color = QColorDialog.getColor(Qt.GlobalColor.red, self, self.tr("Select Grid Color"))
         if color.isValid():
-            MenuWidget.grid_color = color
+            Settings.grid_color = color
             self.sig_grid_changed.emit()
             self.ui.GridColorValue.setStyleSheet(f"background-color: {color.name()};")
 
     @Slot(int)
     def on_cut_off_threshold_changed(self, value: int):
-        MenuWidget.cut_off_threshold = value
+        Settings.cut_off_threshold = value
 
     @Slot()
     def on_apply_button_clicked(self):
@@ -90,4 +88,23 @@ class MenuWidget(QWidget):
         elif progress == Progress.ERROR:
             self.ui.ApplyButton.setText("Apply")
             self.ui.ApplyButton.setEnabled(True)
-            QMessageBox.critical(self, "Error", "An error occurred during processing.")
+            if self.ui.ApplyButton.text() == "Processing...":
+                QMessageBox.critical(self, "Error", "An error occurred during processing.")
+
+    @Slot()
+    def save_processed_image(self):
+        """Save the processed image to a file."""
+        if ImagesHandler.processed_img is not None:
+            try:
+                img = Image.fromarray(ImagesHandler.processed_img)
+                path = QStandardPaths.standardLocations(QStandardPaths.StandardLocation.HomeLocation.DesktopLocation)
+                fileName, _ = QFileDialog.getSaveFileName(self, "Save Image", path[0], "Images (*.bmp)")
+                
+                if fileName is None or fileName == "":
+                    return
+                
+                img.save(fileName)
+            except Exception as e:
+                QMessageBox.critical(None, "Error", f"Failed to save image: {str(e)}")
+        else:
+            QMessageBox.warning(None, "Warning", "No processed image to save.")

@@ -2,7 +2,7 @@ import ctypes
 import os
 import platform
 from types import NoneType
-from typing import Callable, TypeAlias
+from typing import Callable
 
 
 class DCTContext(ctypes.Structure):

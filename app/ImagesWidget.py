@@ -1,16 +1,60 @@
 from typing import Optional
 
-from PIL.ImageQt import QPixmap
-from PySide6.QtCore import Qt, Slot, QLineF, QEvent, Signal
-from PySide6.QtGui import QPainter, QPen, QColor, QImage
-from PySide6.QtWidgets import QWidget, QGraphicsPixmapItem, QGraphicsScene, QGraphicsView, QVBoxLayout
-from PIL import Image
 import numpy as np
+from PIL import Image
+from PIL.ImageQt import QPixmap
+from PySide6.QtCore import Qt, Slot, Signal
+from PySide6.QtGui import QPainter, QPen
+from PySide6.QtWidgets import QWidget, QGraphicsPixmapItem, QGraphicsScene, QVBoxLayout
 
 from .LoadingCircle import LoadingCircle
-from .MenuWidget import MenuWidget
+from .Settings import Settings
 from .lib.DCT2Handler import Progress
 from .ui_generated.ui_ImagesWidget import Ui_ImagesWidget
+
+
+def update_display(pixmap: QPixmap, item: QGraphicsPixmapItem, no_grid = False):
+    """Update the displayed pixmap with or without grid"""
+    if pixmap is None:
+        return
+
+    display_pixmap = pixmap.copy()
+    painter = QPainter(display_pixmap)
+    painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, False)
+    # Create a copy of the original pixmap
+
+    painter.drawPixmap(0, 0, display_pixmap)
+
+    # Draw grid if enabled
+    if Settings.grid_enabled and not no_grid:
+        color = Settings.grid_color
+        color.setAlpha(240)
+
+        pen = QPen(color)
+
+        # Calcola la dimensione dei blocchi
+        block_width = display_pixmap.width() // Settings.block_size
+        block_height = display_pixmap.height() // Settings.block_size
+        x_size = block_width * Settings.block_size
+        y_size = block_height * Settings.block_size
+
+        pen.setWidth(display_pixmap.width() // 200)
+        painter.setPen(pen)
+        # Disegna linee orizzontali per blocchi completi
+        for i in range(Settings.block_size + 1):
+            y = i * block_height
+            painter.drawLine(0, y, x_size, y)
+
+        pen.setWidth(display_pixmap.height() // 200)
+        painter.setPen(pen)
+        # Disegna linee verticali per blocchi completi
+        for i in range(Settings.block_size + 1):
+            x = i * block_width
+            painter.drawLine(x, 0, x, y_size)
+
+    painter.end()
+
+    item.setPixmap(display_pixmap)
 
 
 class ImagesWidget(QWidget):
@@ -56,7 +100,7 @@ class ImagesWidget(QWidget):
         """Load an image from file path"""
         self.raw_original_img_pixmap = Image.fromarray(image_array).toqpixmap()
         if self.raw_original_img_pixmap:
-            self.update_display(self.raw_original_img_pixmap, self.PixmapItem)
+            update_display(self.raw_original_img_pixmap, self.PixmapItem)
             self.ui.OriginalImg.show()
             self.sig_fit_items.emit()
 
@@ -65,7 +109,7 @@ class ImagesWidget(QWidget):
         """Load a processed image"""
         self.raw_processed_img_pixmap = Image.fromarray(image_array).toqpixmap()
         if self.raw_processed_img_pixmap:
-            self.update_display(self.raw_processed_img_pixmap, self.ProcessedPixmapItem, no_grid=True)
+            update_display(self.raw_processed_img_pixmap, self.ProcessedPixmapItem, no_grid=True)
             self.ui.ProcessedImg.show()
             self.sig_fit_items.emit()
 
@@ -83,6 +127,8 @@ class ImagesWidget(QWidget):
             self.ui.MainLayout.addLayout(self.loadig_layout)
             self.loading_circle.start()
         else:
+            if self.loading_circle is None:
+                return
             self.loading_circle.hide()
             self.loading_circle.stop()
             self.loadig_layout.removeWidget(self.loading_circle)
@@ -92,7 +138,7 @@ class ImagesWidget(QWidget):
 
     @Slot()
     def on_grid_changed(self):
-        self.update_display(self.raw_original_img_pixmap, self.PixmapItem, self.ui.OriginalImg)
+        update_display(self.raw_original_img_pixmap, self.PixmapItem)
 
     @Slot()
     def fit_items(self):
@@ -104,39 +150,3 @@ class ImagesWidget(QWidget):
         """Handle resize events"""
         super(ImagesWidget, self).resizeEvent(event)
         self.fit_items()
-
-    def update_display(self, pixmap: QPixmap, item: QGraphicsPixmapItem, no_grid = False):
-        """Update the displayed pixmap with or without grid"""
-        if pixmap is None:
-            return
-
-        display_pixmap = pixmap.copy()
-        painter = QPainter(display_pixmap)
-        painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, False)
-        # Create a copy of the original pixmap
-
-        painter.drawPixmap(0, 0, display_pixmap)
-
-        # Draw grid if enabled
-        if MenuWidget.grid_enabled and not no_grid:
-            pen = QPen(MenuWidget.grid_color)
-            pen.setWidth(1)
-            painter.setPen(pen)
-
-            # Calcola la dimensione dei blocchi
-            block_width = display_pixmap.width() // MenuWidget.block_size
-            block_height = display_pixmap.height() // MenuWidget.block_size
-
-            # Disegna linee orizzontali per blocchi completi
-            for i in range(0, MenuWidget.block_size + 1):
-                y = i * block_height
-                painter.drawLine(0, y, block_width * MenuWidget.block_size, y)
-
-            # Disegna linee verticali per blocchi completi
-            for i in range(0, MenuWidget.block_size + 1):
-                x = i * block_width
-                painter.drawLine(x, 0, x, block_height * MenuWidget.block_size)
-
-        painter.end()
-
-        item.setPixmap(display_pixmap)

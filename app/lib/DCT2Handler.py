@@ -1,12 +1,10 @@
 import ctypes
+import sys
 from enum import IntEnum
 
 import numpy as np
 from PySide6.QtCore import QObject, QThread, Slot, Signal
 from scipy.fftpack import dctn, idctn
-
-import sys
-
 
 from .DCT2Library import DCT2Library, DoublePtr
 
