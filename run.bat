@@ -14,13 +14,11 @@ if not defined VSCMD_VER (
     echo Visual Studio environment variables are already set. Skipping vcvars64.bat.
 )
 
-set LOCAL_LIB=true
-
 REM Navigate to build directory and build the project
 echo Building project in build directory...
 if not exist build mkdir build
 cd build
-cmake ..
+cmake -DLOCAL_LIB=true ..
 if %ERRORLEVEL% NEQ 0 (
     cd ..
     exit /b errorcode

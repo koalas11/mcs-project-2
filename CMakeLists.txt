@@ -12,7 +12,10 @@ else()
 	add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-set(FORCE_SLOW true)
+option(FORCE_SLOW "Force the O(n^2) algorithm" true)
+if (WIN32)
+	option(LOCAL_LIB "Force the use of local FFTW3 Libraries" false)
+endif()
 
 # Define directories
 set(SRC_DIR "${CMAKE_SOURCE_DIR}/src")
@@ -78,8 +81,8 @@ set_target_properties(dct2_test PROPERTIES
 )
 target_include_directories(dct2_test PRIVATE ${SRC_DIR})
 
-if(WIN32 AND $ENV{LOCAL_LIB})
-    set(fftw3_DIR "${CMAKE_SOURCE_DIR}/lib")
+if(WIN32 AND LOCAL_LIB)
+  set(fftw3_DIR "${CMAKE_SOURCE_DIR}/lib")
 endif()
 
 find_package(fftw3 REQUIRED)

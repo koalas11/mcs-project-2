@@ -16,6 +16,7 @@
   // flipped: true
 )
 
+#set image(scaling: "pixelated")
 #outline(target: figure.where(kind: "code"), title: [Indice codici])
 #pagebreak(weak: true)
 

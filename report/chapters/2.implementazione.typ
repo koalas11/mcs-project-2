@@ -43,7 +43,7 @@ Il confronto tra l'implementazione naive e quella basata su FFTW viene effettuat
 
 // The Python GUI for image compression provides a user-friendly interface to apply the DCT and visualize the results. It allows users to select images, apply the DCT, and view the compressed images in real-time.
 
-L'interfaccia grafica Python per la compressione di immagini offre un ambiente intuitivo per applicare la DCT e visualizzarne i risultati. Consente agli utenti di selezionare immagini, applicare la DCT e visualizzare le immagini compresse in tempo reale.
+L'interfaccia grafica Python per la compressione di immagini offre un ambiente intuitivo per applicare la DCT e visualizzarne i risultati. Consente agli utenti di selezionare immagini, selezionare i parametri di compressione e visualizzare le immagini risultanti in tempo reale.
 
 L'implementazione si basa sulle seguenti tecnologie:
 

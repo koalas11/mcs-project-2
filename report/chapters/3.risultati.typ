@@ -126,7 +126,7 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
     image("../images/deer.png"),
     image("../images/deer_20_1.png"),
   ),
-)
+) <figure_deer_destroyed>
 
 #figure(
   caption: [Sinistra: immagine non compressa. Destra: immagine compressa con $F = 20$ e $d = 10$],
@@ -136,7 +136,7 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
     image("../images/deer.png"),
     image("../images/deer_20_10.png"),
   ),
-)
+) <figure_deer_gibbs>
 
 #figure(
   caption: [Sinistra: immagine non compressa. Destra: immagine compressa con $F = 20$ e $d = 3$],
@@ -146,7 +146,7 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
     image("../images/80x80.png"),
     image("../images/80x80_20_3.png"),
   ),
-)
+) <figure_checkerboard_lo>
 
 #figure(
   caption: [Sinistra: immagine non compressa. Destra: immagine compressa con $F = 274$ e $d = 20$],
@@ -156,7 +156,7 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
     image("../images/bridge.png"),
     image("../images/bridge_274_20.png"),
   ),
-)
+) <figure_bridge_lo>
 
 #figure(
   caption: [Sinistra: immagine non compressa. Destra: immagine compressa con $F = 274$ e $d = 30$],
@@ -166,7 +166,7 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
     image("../images/bridge.png"),
     image("../images/bridge_274_30.png"),
   ),
-)
+) <figure_bridge_hi>
 
 #figure(
   caption: [Sinistra: immagine non compressa. Destra: immagine compressa con $F = 200$ e $d = 20$],
@@ -176,7 +176,7 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
     image("../images/cathedral.png"),
     image("../images/cathedral_200_20.png"),
   ),
-)
+) <figure_cathedral_lo>
 
 #figure(
   caption: [Sinistra: immagine non compressa. Destra: immagine compressa con $F = 200$ e $d = 30$],
@@ -186,7 +186,7 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
     image("../images/cathedral.png"),
     image("../images/cathedral_200_30.png"),
   ),
-)
+) <figure_cathedral_hi>
 
 #figure(
   caption: [Sinistra: immagine non compressa. Destra: immagine compressa con $F = 20$ e $d = 1$],
@@ -196,7 +196,7 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
     image("../images/prova.png"),
     image("../images/prova_20_1.png"),
   ),
-)
+) <figure_c_lo>
 
 #figure(
   caption: [Sinistra: immagine non compressa. Destra: immagine compressa con $F = 20$ e $d = 20$],
@@ -206,7 +206,7 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
     image("../images/prova.png"),
     image("../images/prova_20_20.png"),
   ),
-)
+) <figure_c_hi>
 
 #figure(
   caption: [Sinistra: immagine non compressa. Destra: immagine compressa con $F = 20$ e $d = 1$],
@@ -216,7 +216,7 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
     image("../images/shoe.png"),
     image("../images/shoe_20_1.png"),
   ),
-)
+) <figure_shoe_destroyed>
 
 #figure(
   caption: [Sinistra: immagine non compressa. Destra: immagine compressa con $F = 50$ e $d = 10$],
@@ -226,7 +226,7 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
     image("../images/bird.png"),
     image("../images/bird_50_10.png"),
   ),
-)
+) <figure_loki_lo>
 
 #figure(
   caption: [Sinistra: immagine non compressa. Destra: immagine compressa con $F = 50$ e $d = 20$],
@@ -236,4 +236,12 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
     image("../images/bird.png"),
     image("../images/bird_50_20.png"),
   ),
-)
+) <figure_loki_hi>
+
+Data la quantità di immagini, elenchiamo i punti salienti di ciascuna. Inizialmente, evidenziamo la presenza del fenomeno di Gibbs in @figure_deer_gibbs, @figure_c_hi, @figure_bridge_lo, @figure_loki_lo, dovuto a una semplice periodicizzazione dei valori senza riflessione simmetrica sulle ordinate.
+
+In @figure_bridge_hi, si osserva come il rumore, dovuto al basso valore ISO della fotocamera utilizzata, scompaia dopo la compressione, creando un gradiente miscelato nel cielo.
+
+In @figure_checkerboard_lo, @figure_deer_destroyed, @figure_shoe_destroyed, si nota come una compressione con eliminazione delle frequenze troppo aggressiva preservi una parvenza dell’immagine originale, uniformando il colore del blocco, similmente a un kernel convolutivo.
+
+Infine, in @figure_deer_gibbs, @figure_bridge_hi, @figure_loki_hi, @figure_cathedral_hi, si osserva come valori di blocchi grandi ed eliminazione di frequenze meno aggressiva possano ottenere un risultato promettente, mantenendo il soggetto raffigurato. Inoltre, come dimostrato in @figure_loki_hi e @figure_loki_lo, la compressione funziona analogamente per ogni canale di colore, consentendo la compressione di immagini a colori.
