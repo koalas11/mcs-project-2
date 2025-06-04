@@ -22,7 +22,7 @@ Il progetto offre diverse possibilità di espansione e miglioramento:
 
 3. *Estensione alla compressione video*: Un'evoluzione naturale del progetto sarebbe l'estensione alla compressione video, sfruttando la ridondanza temporale tra frame consecutivi.
 
-4. *Miglioramento dell'interfaccia utente*: L'interfaccia grafica potrebbe essere arricchita con funzionalità aggiuntive, come il confronto diretto tra diverse strategie di quantizzazione o l'analisi dettagliata degli artefatti di compressione.
+4. *Miglioramento dell'interfaccia utente*: L'interfaccia grafica potrebbe essere arricchita con funzionalità aggiuntive, come l'analisi dettagliata degli artefatti di compressione.
 
 5. *Implementazione di tecniche avanzate*: Si potrebbero integrare tecniche più recenti, come la DCT adattiva o algoritmi per la riduzione degli artefatti di blocco.
 

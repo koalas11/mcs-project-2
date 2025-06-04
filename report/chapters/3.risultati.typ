@@ -242,6 +242,6 @@ Data la quantità di immagini, elenchiamo i punti salienti di ciascuna. Inizialm
 
 In @figure_bridge_hi, si osserva come il rumore, dovuto al basso valore ISO della fotocamera utilizzata, scompaia dopo la compressione, creando un gradiente miscelato nel cielo.
 
-In @figure_checkerboard_lo, @figure_deer_destroyed, @figure_shoe_destroyed, si nota come una compressione con eliminazione delle frequenze troppo aggressiva preservi una parvenza dell’immagine originale, uniformando il colore del blocco, similmente a un kernel convolutivo.
+In @figure_checkerboard_lo, @figure_deer_destroyed, @figure_shoe_destroyed, si nota come una compressione con eliminazione delle frequenze troppo aggressiva preservi una parvenza dell'immagine originale, uniformando il colore del blocco, similmente a un kernel convolutivo.
 
 Infine, in @figure_deer_gibbs, @figure_bridge_hi, @figure_loki_hi, @figure_cathedral_hi, si osserva come valori di blocchi grandi ed eliminazione di frequenze meno aggressiva possano ottenere un risultato promettente, mantenendo il soggetto raffigurato. Inoltre, come dimostrato in @figure_loki_hi e @figure_loki_lo, la compressione funziona analogamente per ogni canale di colore, consentendo la compressione di immagini a colori.

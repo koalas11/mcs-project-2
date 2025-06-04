@@ -77,6 +77,7 @@ class MenuWidget(QWidget):
         self.ui.NumBlocksValue.setText(str((self.img_size_x // size) * (self.img_size_y // size)))
         self.ui.CutOffThresholdSpinBox.setRange(0, size * 2 - 2)
         self.sig_grid_changed.emit()
+        self.update_compression_perc()
 
     @Slot()
     def on_grid_color_button_clicked(self):
@@ -89,6 +90,26 @@ class MenuWidget(QWidget):
     @Slot(int)
     def on_cut_off_threshold_changed(self, value: int):
         Settings.cut_off_threshold = value
+        self.update_compression_perc()
+
+    def update_compression_perc(self):
+        total_pixels = self.img_size_x * self.img_size_y
+        num_blocks = (self.img_size_x // Settings.block_size) * (self.img_size_y // Settings.block_size)
+
+        removed_per_block = sum(
+            1 for i in range(Settings.block_size) for j in range(Settings.block_size) if i + j >= Settings.cut_off_threshold
+        )
+
+        removed_total = num_blocks * removed_per_block
+
+        if total_pixels == 0:
+            compression_ratio = 0
+        else:
+            compression_ratio = (total_pixels - removed_total) / total_pixels
+
+        self.ui.CompressionPercValue.setText(f"{(1 - compression_ratio) * 100:.2f}%")
+        self.ui.CompressionRatioValue.setText(f"{compression_ratio:.2f}")
+
 
     @Slot()
     def on_apply_button_clicked(self):

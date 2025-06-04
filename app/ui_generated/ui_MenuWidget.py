@@ -23,7 +23,7 @@ class Ui_MenuWidget(object):
     def setupUi(self, MenuWidget):
         if not MenuWidget.objectName():
             MenuWidget.setObjectName(u"MenuWidget")
-        MenuWidget.resize(401, 324)
+        MenuWidget.resize(401, 348)
         self.verticalLayout = QVBoxLayout(MenuWidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.ImageFileLabel = QLabel(MenuWidget)
@@ -103,6 +103,42 @@ class Ui_MenuWidget(object):
 
 
         self.verticalLayout.addLayout(self.NumBlocksLayout)
+
+        self.CompressionPercLayout = QHBoxLayout()
+        self.CompressionPercLayout.setObjectName(u"CompressionPercLayout")
+        self.CompressionPercLayout.setContentsMargins(-1, 0, -1, -1)
+        self.CompressionPercLabel = QLabel(MenuWidget)
+        self.CompressionPercLabel.setObjectName(u"CompressionPercLabel")
+        sizePolicy1.setHeightForWidth(self.CompressionPercLabel.sizePolicy().hasHeightForWidth())
+        self.CompressionPercLabel.setSizePolicy(sizePolicy1)
+
+        self.CompressionPercLayout.addWidget(self.CompressionPercLabel)
+
+        self.CompressionPercValue = QLabel(MenuWidget)
+        self.CompressionPercValue.setObjectName(u"CompressionPercValue")
+
+        self.CompressionPercLayout.addWidget(self.CompressionPercValue)
+
+
+        self.verticalLayout.addLayout(self.CompressionPercLayout)
+
+        self.CompressionRatioLayout = QHBoxLayout()
+        self.CompressionRatioLayout.setObjectName(u"CompressionRatioLayout")
+        self.CompressionRatioLayout.setContentsMargins(-1, 0, -1, -1)
+        self.CompressionRatioLabel = QLabel(MenuWidget)
+        self.CompressionRatioLabel.setObjectName(u"CompressionRatioLabel")
+        sizePolicy1.setHeightForWidth(self.CompressionRatioLabel.sizePolicy().hasHeightForWidth())
+        self.CompressionRatioLabel.setSizePolicy(sizePolicy1)
+
+        self.CompressionRatioLayout.addWidget(self.CompressionRatioLabel)
+
+        self.CompressionRatioValue = QLabel(MenuWidget)
+        self.CompressionRatioValue.setObjectName(u"CompressionRatioValue")
+
+        self.CompressionRatioLayout.addWidget(self.CompressionRatioValue)
+
+
+        self.verticalLayout.addLayout(self.CompressionRatioLayout)
 
         self.GridColorLayout = QHBoxLayout()
         self.GridColorLayout.setObjectName(u"GridColorLayout")
@@ -190,6 +226,10 @@ class Ui_MenuWidget(object):
         self.ToggleGridButton.setText(QCoreApplication.translate("MenuWidget", u"Disable Grid", None))
         self.NumBlocksLabel.setText(QCoreApplication.translate("MenuWidget", u"Num Blocks:", None))
         self.NumBlocksValue.setText("")
+        self.CompressionPercLabel.setText(QCoreApplication.translate("MenuWidget", u"Compression Percentage:", None))
+        self.CompressionPercValue.setText(QCoreApplication.translate("MenuWidget", u"0.00%", None))
+        self.CompressionRatioLabel.setText(QCoreApplication.translate("MenuWidget", u"Compression Ratio:", None))
+        self.CompressionRatioValue.setText(QCoreApplication.translate("MenuWidget", u"0.00", None))
         self.GridColorLabel.setText(QCoreApplication.translate("MenuWidget", u"Current Grid Color:", None))
         self.CutOffThresholdLabel.setText(QCoreApplication.translate("MenuWidget", u"Cut Off Threshold", None))
         self.ScipyImplCheckBox.setText(QCoreApplication.translate("MenuWidget", u"Use Scipy Implementation", None))
