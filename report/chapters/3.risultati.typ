@@ -14,7 +14,7 @@ I benchmark eseguiti hanno consentito di confrontare le prestazioni dell'impleme
 
 - *Scalabilità:* Con l'aumentare delle dimensioni dell'input, la differenza prestazionale tra le due implementazioni è diventata sempre più pronunciata. Per immagini di piccole dimensioni ($8 times 8$ pixel), la differenza è risultata marginale, mentre per immagini di medie e grandi dimensioni, l'implementazione FFTW ha dimostrato vantaggi significativi.
 
-- *Prestazioni su piccole dimensioni:* Fino a blocchi di dimensione 32, la nostra implementazione risulta più veloce rispetto a FFTW, in quanto quest'ultimo deve creare un planning prima di eseguire i calcoli. Questo overhead iniziale incide in particolare su dataset di dimensioni ridotte, rendendo la nostra soluzione più efficiente in questi casi.
+- *Prestazioni su piccole dimensioni:* Come si puo notare in @figure_benchmark, fino a blocchi di dimensione $n = 32$, la nostra implementazione risulta più veloce rispetto a FFTW, in quanto quest'ultimo deve creare un planning prima di eseguire i calcoli. Questo overhead iniziale incide in particolare su dataset di dimensioni ridotte, rendendo la nostra soluzione più efficiente in questi casi.
 
 La differenza di prestazioni è particolarmente rilevante in scenari applicativi reali, in cui la trasformata deve essere applicata ripetutamente a numerosi blocchi di immagine. L'implementazione ottimizzata ha reso possibile l'elaborazione in tempo reale anche per immagini ad alta risoluzione.
 
@@ -53,7 +53,7 @@ La differenza di prestazioni è particolarmente rilevante in scenari applicativi
         size: (12, 6),
         plot-style: cetz-color-palette.with(stroke: true),
         mark-style: cetz-color-palette.with(stroke: true, fill: true),
-        x-label: [n],
+        x-label: [$n$],
         y-label: [Tempo di calcolo \[$log_(10)(s)$\]],
         y-tick-step: none,
         y-ticks: range(min, max + 1).map(i => (i, $10^#i$)),
@@ -63,7 +63,7 @@ La differenza di prestazioni è particolarmente rilevante in scenari applicativi
         // y-ticks: range(min, max + 1),
         // y-format: v => $10^#{ v }$,
         x-min: -1,
-        x-ticks: benches-enum.map(((i, it)) => (i, it.n)),
+        x-ticks: benches-enum.map(((i, it)) => (i, $it.n$)),
         x-tick-step: none,
         legend: "inner-north-west",
         axis-style: "left",
@@ -102,7 +102,7 @@ La differenza di prestazioni è particolarmente rilevante in scenari applicativi
       )
     })
   },
-)
+) <figure_benchmark>
 
 == Risultati della compressione delle immagini
 
@@ -112,7 +112,7 @@ L'applicazione della Discrete Cosine Transform (DCT) alla compressione delle imm
 
 I test di compressione hanno evidenziato quanto segue:
 
-- *Rapporto di compressione:* Anche con un rapporto di compressione elevato, l'immagine conserva comunque una riconoscibilità sufficiente.
+- *Rapporto di compressione:* Anche con un rapporto di compressione elevato, l'immagine conserva sufficiente riconoscibilità.
 
 - *Qualità percepita:* La DCT si è dimostrata particolarmente efficace nel preservare le caratteristiche visivamente rilevanti dell'immagine, anche a livelli di compressione elevati. Ciò è dovuto alla proprietà della DCT di concentrare l'energia dell'immagine nei coefficienti a bassa frequenza.
 
@@ -145,8 +145,8 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
   grid(
     columns: (1fr,) * 2,
     column-gutter: 0.75em,
-    image("../images/80x80.png"),
-    image("../images/80x80_5_1.png"),
+    image("../images/80x80.png", width: 50%),
+    image("../images/80x80_5_1.png", width: 50%),
   ),
 ) <figure_checkerboard_equal>
 
@@ -155,8 +155,8 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
   grid(
     columns: (1fr,) * 2,
     column-gutter: 0.75em,
-    image("../images/80x80.png"),
-    image("../images/80x80_20_3.png"),
+    image("../images/80x80.png", width: 50%),
+    image("../images/80x80_20_3.png", width: 50%),
   ),
 ) <figure_checkerboard_lo>
 
@@ -165,8 +165,8 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
   grid(
     columns: (1fr,) * 2,
     column-gutter: 0.75em,
-    image("../images/bridge.png"),
-    image("../images/bridge_274_20.png"),
+    image("../images/bridge.png", width: 80%),
+    image("../images/bridge_274_20.png", width: 80%),
   ),
 ) <figure_bridge_lo>
 
@@ -175,8 +175,8 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
   grid(
     columns: (1fr,) * 2,
     column-gutter: 0.75em,
-    image("../images/bridge.png"),
-    image("../images/bridge_274_30.png"),
+    image("../images/bridge.png", width: 80%),
+    image("../images/bridge_274_30.png", width: 80%),
   ),
 ) <figure_bridge_hi>
 
@@ -185,8 +185,8 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
   grid(
     columns: (1fr,) * 2,
     column-gutter: 0.75em,
-    image("../images/cathedral.png"),
-    image("../images/cathedral_200_20.png"),
+    image("../images/cathedral.png", width: 80%),
+    image("../images/cathedral_200_20.png", width: 80%),
   ),
 ) <figure_cathedral_lo>
 
@@ -195,8 +195,8 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
   grid(
     columns: (1fr,) * 2,
     column-gutter: 0.75em,
-    image("../images/cathedral.png"),
-    image("../images/cathedral_200_30.png"),
+    image("../images/cathedral.png", width: 80%),
+    image("../images/cathedral_200_30.png", width: 80%),
   ),
 ) <figure_cathedral_hi>
 
@@ -205,8 +205,8 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
   grid(
     columns: (1fr,) * 2,
     column-gutter: 0.75em,
-    image("../images/prova.png"),
-    image("../images/prova_20_1.png"),
+    image("../images/prova.png", width: 60%),
+    image("../images/prova_20_1.png", width: 60%),
   ),
 ) <figure_c_lo>
 
@@ -215,8 +215,8 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
   grid(
     columns: (1fr,) * 2,
     column-gutter: 0.75em,
-    image("../images/prova.png"),
-    image("../images/prova_20_20.png"),
+    image("../images/prova.png", width: 60%),
+    image("../images/prova_20_20.png", width: 60%),
   ),
 ) <figure_c_hi>
 
@@ -225,8 +225,8 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
   grid(
     columns: (1fr,) * 2,
     column-gutter: 0.75em,
-    image("../images/shoe.png"),
-    image("../images/shoe_20_1.png"),
+    image("../images/shoe.png", width: 80%),
+    image("../images/shoe_20_1.png", width: 80%),
   ),
 ) <figure_shoe_destroyed>
 

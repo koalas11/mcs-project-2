@@ -1,6 +1,7 @@
 .idea
 .venv
 .clangd
+.DS_Store
 __pycache__
 old/
 build/

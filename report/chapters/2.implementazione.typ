@@ -32,7 +32,7 @@ L'obiettivo era sfruttare le potenzialità di Vulkan per eseguire la DCT in para
 
 L'implementazione in C della Trasformata Discreta del Coseno è progettata per calcolare le trasformate DCT-II e DCT-III con un approccio diretto. Pur non essendo ottimizzata per l'efficienza, questa implementazione offre una chiara rappresentazione algoritmica delle formule matematiche presentate nel capitolo precedente.
 
-Il codice è disponibile nell'appendice del progetto e supporta sia trasformate monodimensionali che bidimensionali. @dct2.c.
+Il @dct2.c è disponibile nell'appendice del progetto e supporta sia trasformate monodimensionali che bidimensionali.
 
 Questa implementazione presenta una complessità computazionale di $O(n^2)$ per la trasformata unidimensionale e $O(n^3)$ per quella bidimensionale, come discusso nella sezione teorica. L'algoritmo per la DCT-III (inversa) segue un approccio analogo, con le opportune modifiche alla formula.
 
