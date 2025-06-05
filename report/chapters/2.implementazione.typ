@@ -40,7 +40,7 @@ Questa implementazione presenta una complessità computazionale di $O(n^2)$ per 
 
 // The comparison code using FFTW is designed to benchmark the performance of the DCT implementation against the Fast Fourier Transform (FFT) provided by the FFTW library. This allows for a performance comparison between the naive DCT implementation and the optimized FFT.
 
-Il codice di confronto utilizza la libreria FFTW (Fastest Fourier Transform in the West) per implementare una versione ottimizzata della DCT. FFTW fornisce un'implementazione altamente efficiente della Fast Fourier Transform, che può essere adattata per calcolare la DCT con complessità $O(n log_2 n)$ per la trasformata unidimensionale.
+Il codice di confronto utilizza la libreria FFTW (Fastest Fourier Transform in the West) per implementare una versione ottimizzata della DCT. FFTW fornisce un'implementazione altamente efficiente della Fast Fourier Transform, che può essere adattata per calcolare la DCT con complessità $O(n log_2 n)$ per la trasformata unidimensionale. @fftw
 
 Questa libreria però non effettua la normalizzazione della DCT, quindi è necessario applicare i fattori di normalizzazione manualmente per ottenere risultati comparabili con l'implementazione naive.
 
@@ -76,3 +76,8 @@ L'interfaccia consente inoltre di alternare tra l'implementazione naive e quella
   caption: [Immagine dell'applicazione],
   image("../images/app.png"),
 ) <figure_app>
+
+#figure(
+  caption: [Immagine dell'applicazione],
+  image("../images/app2.png"),
+) <figure_app2>

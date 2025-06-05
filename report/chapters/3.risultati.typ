@@ -14,6 +14,8 @@ I benchmark eseguiti hanno consentito di confrontare le prestazioni dell'impleme
 
 - *Scalabilità:* Con l'aumentare delle dimensioni dell'input, la differenza prestazionale tra le due implementazioni è diventata sempre più pronunciata. Per immagini di piccole dimensioni ($8 times 8$ pixel), la differenza è risultata marginale, mentre per immagini di medie e grandi dimensioni, l'implementazione FFTW ha dimostrato vantaggi significativi.
 
+- *Prestazioni su piccole dimensioni:* Fino a blocchi di dimensione 32, la nostra implementazione risulta più veloce rispetto a FFTW, in quanto quest'ultimo deve creare un planning prima di eseguire i calcoli. Questo overhead iniziale incide in particolare su dataset di dimensioni ridotte, rendendo la nostra soluzione più efficiente in questi casi.
+
 La differenza di prestazioni è particolarmente rilevante in scenari applicativi reali, in cui la trasformata deve essere applicata ripetutamente a numerosi blocchi di immagine. L'implementazione ottimizzata ha reso possibile l'elaborazione in tempo reale anche per immagini ad alta risoluzione.
 
 #figure(
@@ -110,7 +112,7 @@ L'applicazione della Discrete Cosine Transform (DCT) alla compressione delle imm
 
 I test di compressione hanno evidenziato quanto segue:
 
-- *Rapporto di compressione:* Utilizzando una quantizzazione più aggressiva dei coefficienti ad alta frequenza, sono stati ottenuti rapporti di compressione fino a 20:1, mantenendo una qualità dell'immagine accettabile per la maggior parte delle applicazioni.
+- *Rapporto di compressione:* Anche con un rapporto di compressione elevato, l'immagine conserva comunque una riconoscibilità sufficiente.
 
 - *Qualità percepita:* La DCT si è dimostrata particolarmente efficace nel preservare le caratteristiche visivamente rilevanti dell'immagine, anche a livelli di compressione elevati. Ciò è dovuto alla proprietà della DCT di concentrare l'energia dell'immagine nei coefficienti a bassa frequenza.
 
@@ -137,6 +139,16 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
     image("../images/deer_20_10.png"),
   ),
 ) <figure_deer_gibbs>
+
+#figure(
+  caption: [Sinistra: immagine non compressa. Destra: immagine compressa con $F = 20$ e $d = 3$],
+  grid(
+    columns: (1fr,) * 2,
+    column-gutter: 0.75em,
+    image("../images/80x80.png"),
+    image("../images/80x80_5_1.png"),
+  ),
+) <figure_checkerboard_equal>
 
 #figure(
   caption: [Sinistra: immagine non compressa. Destra: immagine compressa con $F = 20$ e $d = 3$],
@@ -241,6 +253,8 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
 Data la quantità di immagini, elenchiamo i punti salienti di ciascuna. Inizialmente, evidenziamo la presenza del fenomeno di Gibbs in @figure_deer_gibbs, @figure_c_hi, @figure_bridge_lo, @figure_loki_lo, dovuto a una semplice periodicizzazione dei valori senza riflessione simmetrica sulle ordinate.
 
 In @figure_bridge_hi, si osserva come il rumore, dovuto al basso valore ISO della fotocamera utilizzata, scompaia dopo la compressione, creando un gradiente miscelato nel cielo.
+
+In @figure_checkerboard_equal si nota come avendo posto $F = 5$ e $d = 1$, la compressione non abbia alterato l'immagine, mantenendo i valori di ogni blocco invariati. Questo è un caso particolare perchè i blocchi sono monocromaticia e quindi i valori sono uniformi. Tuttavia, si osserva che la compressione non ha introdotto artefatti visivi, mantenendo l'immagine perfettamente riconoscibile.
 
 In @figure_checkerboard_lo, @figure_deer_destroyed, @figure_shoe_destroyed, si nota come una compressione con eliminazione delle frequenze troppo aggressiva preservi una parvenza dell'immagine originale, uniformando il colore del blocco, similmente a un kernel convolutivo.
 
