@@ -9,7 +9,8 @@
 #let c_files = (
   ("../../src/dct2.h", "Interfaccia C comune alle implementazioni"),
   ("../../src/dct2.c", "Implementazione C dell'algoritmo naive"),
-  ("../../src/dct2_fftw.c", "Implementazione C dell'algoritmo DCT-FFT"),
+  ("../../src/fftw-dct2.c", "Implementazione C dell'algoritmo DCT-FFT per il benchmark"),
+  ("../../src/bench-dct2.c", "Implementazione C del benchmark"),
 )
 
 #let python_files = (

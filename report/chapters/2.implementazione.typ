@@ -19,12 +19,13 @@ La struttura principale include:
 
 Tale organizzazione consente un'analisi comparativa diretta tra i diversi approcci e facilita l'estensione del progetto con ulteriori ottimizzazioni o funzionalità.
 
-== Tentativo di Implementazione della DCT in C con Vulkan
+== Tentativo di Implementazione della DCT in C con Vulkan e FFTW
 
 // The attempt to implement the Discrete Cosine Transform (DCT) in C using Vulkan was an exploration of leveraging GPU capabilities for parallel processing. However, this approach faced significant challenges and was ultimately not completed.
 
 Il tentativo di implementare la Trasformata Discreta del Coseno (DCT) in C mediante Vulkan ha rappresentato un'esplorazione delle capacità della GPU nell'elaborazione parallela. Tuttavia, questo approccio si è rivelato particolarmente complesso e non è stato portato a termine.
 L'obiettivo era sfruttare le potenzialità di Vulkan per eseguire la DCT in parallelo sulla GPU, ma la necessità di gestire direttamente le risorse hardware e la limitata esperienza nello sviluppo con Vulkan hanno reso l'implementazione particolarmente ardua.
+Abbiamo tentato di implementare la DCT utilizzando FFTW; tuttavia, poiché volevamo farlo con un array contiguo, non siamo riusciti a ottenere il risultato desiderato. Di conseguenza, abbiamo deciso di utilizzare un implementazione esterna.
 
 == Implementazione C della DCT
 
@@ -44,9 +45,9 @@ Il codice di confronto utilizza la libreria FFTW (Fastest Fourier Transform in t
 
 Questa libreria però non effettua la normalizzazione della DCT, quindi è necessario applicare i fattori di normalizzazione manualmente per ottenere risultati comparabili con l'implementazione naive.
 
-L'implementazione basata su FFTW è disponibile nell'appendice del progetto, nel file @dct2_fftw.c.
+L'implementazione basata su FFTW è disponibile nell'appendice del progetto, nel file @fftw-dct2.c.
 
-Il confronto tra l'implementazione naive e quella basata su FFTW viene effettuato tramite un framework di benchmark che misura il tempo di esecuzione e l'utilizzo di memoria per diverse dimensioni di input, consentendo un'analisi dettagliata delle prestazioni.
+Il confronto tra l'implementazione naive e quella basata su FFTW viene effettuato tramite un framework di benchmark che misura il tempo di esecuzione per diverse dimensioni di input, consentendo un'analisi dettagliata delle prestazioni.
 
 == Implementazione Python della GUI per la compressione di immagini
 

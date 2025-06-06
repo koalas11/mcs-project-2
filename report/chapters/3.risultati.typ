@@ -10,7 +10,7 @@ In questo capitolo sono presentati i risultati ottenuti dalle implementazioni de
 
 I benchmark eseguiti hanno consentito di confrontare le prestazioni dell'implementazione naive della DCT con l'implementazione ottimizzata basata su FFTW. Le misurazioni hanno preso in considerazione diversi parametri:
 
-- *Tempo di esecuzione:* Come previsto dalla teoria, l'implementazione naive ha mostrato un andamento di complessità $O(n^2)$ per array di dimensione $n$, mentre l'implementazione FFTW ha confermato la complessità teorica di $O(n log_2 n)$.
+- *Tempo di esecuzione:* Come previsto dalla teoria, l'implementazione naive ha mostrato un andamento di complessità $O(n^3)$, mentre l'implementazione FFTW ha confermato la complessità teorica di $O(n^2 log_2 n)$.
 
 - *Scalabilità:* Con l'aumentare delle dimensioni dell'input, la differenza prestazionale tra le due implementazioni è diventata sempre più pronunciata. Per immagini di piccole dimensioni ($8 times 8$ pixel), la differenza è risultata marginale, mentre per immagini di medie e grandi dimensioni, l'implementazione FFTW ha dimostrato vantaggi significativi.
 
@@ -19,7 +19,7 @@ I benchmark eseguiti hanno consentito di confrontare le prestazioni dell'impleme
 La differenza di prestazioni è particolarmente rilevante in scenari applicativi reali, in cui la trasformata deve essere applicata ripetutamente a numerosi blocchi di immagine. L'implementazione ottimizzata ha reso possibile l'elaborazione in tempo reale anche per immagini ad alta risoluzione.
 
 #figure(
-  caption: [Confronto tempi di calcolo tra implementazioni con DCT monodimensionale],
+  caption: [Confronto tempi di calcolo tra implementazioni con DCT bidimensionale],
   {
     import "../packages.typ": cetz, cetz-plot.plot
     import "../import.typ": benches
@@ -73,28 +73,28 @@ La differenza di prestazioni è particolarmente rilevante in scenari applicativi
           plot.add(
             benches-enum.map(((i, it)) => (i, calc.log(it.dct2d))),
             mark: "o",
-            label: [DCT-II (Ours) $O(n^2)$],
+            label: [DCT-II (Ours) $O(n^3)$],
             mark-size: .125,
             line: "spline",
           )
           plot.add(
             benches-enum.map(((i, it)) => (i, calc.log(it.idct2d))),
             mark: "o",
-            label: [DCT-III (Ours) $O(n^2)$],
+            label: [DCT-III (Ours) $O(n^3)$],
             mark-size: .125,
             line: "spline",
           )
           plot.add(
             benches-enum.map(((i, it)) => (i, calc.log(it.fftw_dct2d))),
             mark: "o",
-            label: [DCT-II (fftw) $O(n log_2 n)$],
+            label: [DCT-II (fftw) $O(n^2 log_2 n)$],
             mark-size: .125,
             line: "spline",
           )
           plot.add(
             benches-enum.map(((i, it)) => (i, calc.log(it.fftw_idct2d))),
             mark: "o",
-            label: [DCT-III (fftw) $O(n log_2 n)$],
+            label: [DCT-III (fftw) $O(n^2 log_2 n)$],
             mark-size: .125,
             line: "spline",
           )
@@ -141,7 +141,7 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
 ) <figure_deer_gibbs>
 
 #figure(
-  caption: [Sinistra: immagine non compressa. Destra: immagine compressa con $F = 20$ e $d = 3$],
+  caption: [Sinistra: immagine 80x80 non compressa. Destra: immagine 80x80 compressa con $F = 5$ e $d = 1$],
   grid(
     columns: (1fr,) * 2,
     column-gutter: 0.75em,
@@ -151,7 +151,7 @@ L'interfaccia grafica sviluppata ha permesso di esplorare interattivamente quest
 ) <figure_checkerboard_equal>
 
 #figure(
-  caption: [Sinistra: immagine non compressa. Destra: immagine compressa con $F = 20$ e $d = 3$],
+  caption: [Sinistra: immagine 80x80 non compressa. Destra: immagine 80x80 compressa con $F = 20$ e $d = 3$],
   grid(
     columns: (1fr,) * 2,
     column-gutter: 0.75em,
